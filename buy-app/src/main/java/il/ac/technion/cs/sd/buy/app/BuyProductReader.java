@@ -7,7 +7,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 
-
 /** This class will only be instantiated by Guice after one of the setup methods has been called. */
 public interface BuyProductReader {
   /** Returns true iff the given ID is that of a valid (possibly canceled) order. */
