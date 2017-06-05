@@ -51,4 +51,12 @@ public class Order {
 		this.user_id = user_id;
 	}
 
+	public boolean isCancelled() {
+		return "cancel".equals(this.kind);
+	}
+
+	public boolean isModified() {
+		return "modified".equals(this.kind);
+	}
+
 }

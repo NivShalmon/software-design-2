@@ -2,29 +2,51 @@ package il.ac.technion.cs.sd.buy.app;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
+import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
+	private Dict<String, Order> orderIdToOrder;
+	private Dict<String, List<String>> userIdToOrderIdsList;
+	private Dict<String, List<String>> productIdToOrderIdsList;
+
 	@Override
 	public CompletableFuture<Boolean> isValidOrderId(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return CompletableFuture.completedFuture(orderIdToOrder.find(s0).get().isPresent());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CompletableFuture.completedFuture(false);
 	}
 
 	@Override
 	public CompletableFuture<Boolean> isCanceledOrder(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Optional<Order> o = (orderIdToOrder.find(s0).get());
+			return CompletableFuture.completedFuture(o.isPresent() && o.get().isCancelled());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CompletableFuture.completedFuture(false);
 	}
 
 	@Override
 	public CompletableFuture<Boolean> isModifiedOrder(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Optional<Order> o = (orderIdToOrder.find(s0).get());
+			return CompletableFuture.completedFuture(o.isPresent() && o.get().isModified());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return CompletableFuture.completedFuture(false);
 	}
 
 	@Override
