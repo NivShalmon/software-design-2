@@ -2,6 +2,11 @@ package il.ac.technion.cs.sd.sd.buy.test;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
+
 import org.junit.Test;
 
 import il.ac.technion.cs.sd.buy.app.BuyProductInitializer;
@@ -10,14 +15,34 @@ import il.ac.technion.cs.sd.buy.app.BuyProductInitializerImpl;
 public class InitializerTest {
 
 	@Test
-	public void test() {
-		BuyProductInitializer init = new BuyProductInitializerImpl();
-		init.setupXml("<Root>" + "<Product>" + "<id>iphone</id>" + "<price>1000</price>" + "</Product>" + "<Order>"
-				+ "<user-id>1</user-id>" + "<order-id>1</order-id>" + "<product-id>android</product-id>"
-				+ "<amount>5</amount>" + "</Order>" + "<ModifyOrder>" + "<order-id>1</order-id>"
-				+ "<new-amount>10</new-amount>" + "</ModifyOrder>" + "<CancelOrder>" + "<order-id>1</order-id>"
-				+ "</CancelOrder>" + "<Product>" + "<id>android</id>" + "<price>500</price>" + "</Product>"
-				+ "</Root>");
+	public void testXML0() {
+		Scanner scanner;
+		try {
+			scanner = new Scanner(new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small.xml"));
+			String text = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			BuyProductInitializer init = new BuyProductInitializerImpl();
+			init.setupXml(text);
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	@Test
+	public void testJson0() {
+		Scanner scanner;
+		try {
+			scanner = new Scanner(new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small.json"));
+			String text = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			System.out.println(text);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
