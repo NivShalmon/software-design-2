@@ -1,5 +1,6 @@
 package il.ac.technion.cs.sd.buy.app;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,9 +14,12 @@ import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	private Dict<String, Order> orderIdToOrder;
-	private Dict<String, List<String>> userIdToOrderIdsList;
-	private Dict<String, List<String>> productIdToOrderIdsList;
+	private Dict<String, Order> orderIdToOrder; // map orderId ----> Order
+	private Dict<String, List<String>> userIdToOrderIdsList; // map userId ---->
+																// Orders Ids
+	private Dict<String, List<String>> productIdToOrderIdsList; // map productId
+																// ----> Orders
+																// Ids
 
 	@Override
 	public CompletableFuture<Boolean> isValidOrderId(String s0) {
@@ -49,20 +53,23 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<OptionalInt> getNumberOfProductOrdered(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return orderIdToOrder.find(s0)
+				.thenApply(o -> !o.isPresent() ? OptionalInt.empty()
+						: o.get().isCancelled() ? OptionalInt.of(-1 * Integer.parseInt(o.get().getAmount()))
+								: OptionalInt.of(Integer.parseInt(o.get().getAmount())));
+
 	}
 
 	@Override
 	public CompletableFuture<List<Integer>> getHistoryOfOrder(String s0) {
-		// TODO Auto-generated method stub
+		// TODO Dor Add & Think about that
 		return null;
 	}
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsForUser(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		return userIdToOrderIdsList.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>() : lst.get());
 	}
 
 	@Override
