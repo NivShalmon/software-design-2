@@ -1,32 +1,32 @@
 package library;
 
-public class Pair implements Comparable<Pair> {
-	private String key;
-	private String value;
+public class Pair<K extends Comparable<K>,V> implements Comparable<Pair<K,V>> {
+	private K key;
+	private V value;
 
-	public Pair(String key, String value) {
+	public Pair(K key, V value) {
 		this.key = key;
 		this.value = value;
 	}
 
-	public String getValue() {
+	public V getValue() {
 		return this.value;
 	}
 
-	public String getKey() {
+	public K getKey() {
 		return this.key;
 	}
 
-	public void setKey(String key) {
+	public void setKey(K key) {
 		this.key = key;
 	}
 
-	public void setValue(String value) {
+	public void setValue(V value) {
 		this.value = value;
 	}
 
 	@Override
-	public int compareTo(Pair o) {
+	public int compareTo(Pair<K,V> o) {
 		return this.getKey().compareTo(o.getKey());
 	}
 
@@ -47,7 +47,7 @@ public class Pair implements Comparable<Pair> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Pair other = (Pair) obj;
+		Pair<?, ?> other = (Pair<?, ?>) obj;
 		if (key == null) {
 			if (other.key != null)
 				return false;
