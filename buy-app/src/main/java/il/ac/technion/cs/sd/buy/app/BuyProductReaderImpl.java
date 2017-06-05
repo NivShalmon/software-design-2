@@ -20,7 +20,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<Boolean> isValidOrderId(String s0) {
 		try {
-			return CompletableFuture.completedFuture(orderIdToOrder.find(s0).get().isPresent());
+			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -30,8 +30,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<Boolean> isCanceledOrder(String s0) {
 		try {
-			Optional<Order> o = (orderIdToOrder.find(s0).get());
-			return CompletableFuture.completedFuture(o.isPresent() && o.get().isCancelled());
+			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent() && o.get().isCancelled());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -41,8 +40,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<Boolean> isModifiedOrder(String s0) {
 		try {
-			Optional<Order> o = (orderIdToOrder.find(s0).get());
-			return CompletableFuture.completedFuture(o.isPresent() && o.get().isModified());
+			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent() && o.get().isModified());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
