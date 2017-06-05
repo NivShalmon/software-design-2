@@ -10,91 +10,91 @@ import java.util.concurrent.CompletableFuture;
 public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
-	public CompletableFuture<Boolean> isValidOrderId(String orderId) {
+	public CompletableFuture<Boolean> isValidOrderId(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Boolean> isCanceledOrder(String orderId) {
+	public CompletableFuture<Boolean> isCanceledOrder(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Boolean> isModifiedOrder(String orderId) {
+	public CompletableFuture<Boolean> isModifiedOrder(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<OptionalInt> getNumberOfProductOrdered(String orderId) {
+	public CompletableFuture<OptionalInt> getNumberOfProductOrdered(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<List<Integer>> getHistoryOfOrder(String orderId) {
+	public CompletableFuture<List<Integer>> getHistoryOfOrder(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<List<String>> getOrderIdsForUser(String userId) {
+	public CompletableFuture<List<String>> getOrderIdsForUser(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Long> getTotalAmountSpentByUser(String userId) {
+	public CompletableFuture<Long> getTotalAmountSpentByUser(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<List<String>> getUsersThatPurchased(String productId) {
+	public CompletableFuture<List<String>> getUsersThatPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<List<String>> getOrderIdsThatPurchased(String productId) {
+	public CompletableFuture<List<String>> getOrderIdsThatPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String productId) {
+	public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<OptionalDouble> getAverageNumberOfItemsPurchased(String productId) {
+	public CompletableFuture<OptionalDouble> getAverageNumberOfItemsPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<OptionalDouble> getCancelRatioForUser(String userId) {
+	public CompletableFuture<OptionalDouble> getCancelRatioForUser(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<OptionalDouble> getModifyRatioForUser(String userId) {
+	public CompletableFuture<OptionalDouble> getModifyRatioForUser(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String userId) {
+	public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String productId) {
+	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
