@@ -5,17 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import javax.tools.JavaFileObject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import library.Pair;
-import library.Triple;
 
 import org.w3c.dom.Node;
 
@@ -86,6 +85,49 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	@Override
 	public CompletableFuture<Void> setupJson(String s0) {
+		try {
+			final JSONObject obj = new JSONObject(s0.replace("[", "{ \"arr\":[").replaceAll("]", "]}"));
+			final JSONArray arr = obj.getJSONArray("arr");
+			for (int i = 0; i < arr.length(); i++) {
+				String kind = ((JSONObject) arr.get(i)).getString("type");
+				String user_id = null;
+				String order_id = null;
+				String product_id = null;
+				String amount = null;
+				if (kind.equals("product")) {
+					String id = ((JSONObject) arr.get(i)).getString("id");
+					String price = ((JSONObject) arr.get(i)).getString("price");
+					products.put(id, price);
+				}
+				if (kind.equals("cancel-order")) {
+					order_id = ((JSONObject) arr.get(i)).getString("order-id");
+					if (reservations.containsKey(order_id))
+						reservations.get(order_id).setKind("cancel");
+					continue;
+				}
+				if (kind.equals("modify-order")) {
+					order_id = ((JSONObject) arr.get(i)).getString("order-id");
+					amount = ((JSONObject) arr.get(i)).getString("amount");
+					if (reservations.containsKey(order_id)) {
+						reservations.get(order_id).setKind("modified");
+						reservations.get(order_id).setAmount(amount);
+					}
+				}
+				if (kind.equals("order")) {
+					order_id = ((JSONObject) arr.get(i)).getString("order-id");
+					user_id = ((JSONObject) arr.get(i)).getString("user-id");
+					product_id = ((JSONObject) arr.get(i)).getString("product-id");
+					amount = ((JSONObject) arr.get(i)).getString("amount");
+					reservations.put(order_id, new Order(kind, product_id, amount, user_id));
+				}
+			}
+			System.out.println(products);
+			System.out.println(reservations);
+
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 

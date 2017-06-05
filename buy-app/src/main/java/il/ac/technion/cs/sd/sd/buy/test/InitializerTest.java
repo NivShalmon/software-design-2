@@ -38,7 +38,9 @@ public class InitializerTest {
 			scanner = new Scanner(new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small.json"));
 			String text = scanner.useDelimiter("\\A").next();
 			scanner.close();
-			System.out.println(text);
+			BuyProductInitializer init = new BuyProductInitializerImpl();
+			init.setupJson(text);
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
