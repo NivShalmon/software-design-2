@@ -76,8 +76,8 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			}
 			System.out.println(products);
 			System.out.println(reservations);
-		} catch (Exception ¢) {
-			¢.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return null;
