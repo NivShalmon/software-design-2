@@ -22,7 +22,7 @@ public class DictTest {
 
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {
-		Dict<String, String> testDict = f.Create();
+		Dict<String, String> testDict = f.create();
 		testDict.add("a", "Dor");
 		testDict.add("b", "Niv");
 		testDict.store();
@@ -32,7 +32,7 @@ public class DictTest {
 
 	@Test()
 	public void test1() throws InterruptedException, ExecutionException {
-		Dict<String, String> testDict = f.Create();
+		Dict<String, String> testDict = f.create();
 		testDict.add("a", "Dor");
 		testDict.store();
 		//
@@ -41,7 +41,7 @@ public class DictTest {
 
 	@Test()
 	public void test2() throws InterruptedException, ExecutionException {
-		Dict<String, String> testDict = f.Create();
+		Dict<String, String> testDict = f.create();
 		for (int i = 0; i < 3339; i++) {
 			testDict.add(i + "", i + "");
 		}
@@ -52,7 +52,7 @@ public class DictTest {
 
 	@Test()
 	public void test3() throws InterruptedException, ExecutionException {
-		Dict<String, String> testDict = f.Create();
+		Dict<String, String> testDict = f.create();
 		testDict.add("b", "Niv");
 		testDict.add("a", "Dor");
 		testDict.store();

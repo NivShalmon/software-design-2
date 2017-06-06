@@ -26,7 +26,7 @@ public abstract class DictImplFactory<K, V> {
 		return this;
 	}
 
-	public abstract Dict<K, V> Create();
+	public abstract Dict<K, V> create();
 
 	public static class RealDictImplFactory<K,V> extends DictImplFactory<K,V> {
 		private FutureLineStorage s;
@@ -37,7 +37,7 @@ public abstract class DictImplFactory<K, V> {
 		}
 
 		@Override
-		public Dict<K, V> Create() {
+		public Dict<K, V> create() {
 			if (valueParser == null)
 				throw new IllegalStateException();
 			return new DictImpl<K,V>(s, keySerializer, valueSerializer, valueParser);
