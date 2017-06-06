@@ -8,7 +8,7 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
 class BinarySearch {
 	/**
-	 * a vesrion of value of where the high parameter is also
+	 * a vesrion of valueOf where the high parameter is also
 	 * a completable future, to allow using {@link FutureLineStorage#numberOfLines()}
 	 * as the high value 
 	 * @see {@link #valueOf(FutureLineStorage, String, int, int)}
@@ -42,6 +42,15 @@ class BinarySearch {
 				return valueOf(storer,key,low,mid-2);
 			}
 		});
+	}
+	/**
+	 * a vesrion of isIn where the high parameter is also
+	 * a completable future, to allow using {@link FutureLineStorage#numberOfLines()}
+	 * as the high value 
+	 * @see {@link #isIn(FutureLineStorage, String, int, int)}
+	 */
+	static CompletableFuture<Boolean> isIn(FutureLineStorage storer, String key, int low, CompletableFuture<Integer> high){
+		return high.thenCompose(h -> isIn(storer,key,low,h));
 	}
 	/**
 	 * performs an efficient binary search on a {@link FutureLineStorage}

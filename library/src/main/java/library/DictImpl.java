@@ -17,7 +17,6 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
  */
 public class DictImpl<K, V> implements Dict<K, V> {
 	private final FutureLineStorage storer;
-	private boolean initialized = false;
 	private Map<K, V> pairs = new HashMap<>();
 	private Function<K, String> keySerializer;
 	private Function<V, String> valueSerializer;
@@ -37,8 +36,6 @@ public class DictImpl<K, V> implements Dict<K, V> {
 	 * further writes to the {@link Dict}
 	 */
 	public void store() {
-		assert !initialized;
-		initialized = true;
 		pairs.keySet().stream().sorted().forEachOrdered(key -> {
 			storer.appendLine(keySerializer.apply(key));
 			storer.appendLine(valueSerializer.apply(pairs.get(key)));
@@ -54,7 +51,6 @@ public class DictImpl<K, V> implements Dict<K, V> {
 	 */
 	@Override
 	public void add(K key, V value) {
-		assert !initialized;
 		pairs.put(key, value);
 	}
 
@@ -67,7 +63,6 @@ public class DictImpl<K, V> implements Dict<K, V> {
 	 */
 	@Override
 	public void addAll(Map<K, V> ps) {
-		assert !initialized;
 		pairs.putAll(ps);
 	}
 

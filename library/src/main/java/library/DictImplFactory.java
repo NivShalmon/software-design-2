@@ -12,27 +12,30 @@ public abstract class DictImplFactory<K, V> {
 	Function<String, V> valueParser;
 
 	public DictImplFactory<K, V> setKeySerializer(Function<K, String> keySerializer) {
-		this.keySerializer = keySerializer;
+		if(keySerializer != null)
+			this.keySerializer = keySerializer;
 		return this;
 	}
 
 	public DictImplFactory<K,V> setValueSerializer(Function<V, String> valueSerializer) {
-		this.valueSerializer = valueSerializer;
+		if (valueSerializer != null)
+			this.valueSerializer = valueSerializer;
 		return this;
 	}
 
 	public DictImplFactory<K, V> setValueParser(Function<String, V> valueParser) {
-		this.valueParser = valueParser;
+		if (valueParser != null)
+			this.valueParser = valueParser;
 		return this;
 	}
 
 	public abstract Dict<K, V> create();
 
-	public static class RealDictImplFactory<K,V> extends DictImplFactory<K,V> {
+	public static class DictImplFactoryImpl<K,V> extends DictImplFactory<K,V> {
 		private FutureLineStorage s;
 
 		@Inject
-		public RealDictImplFactory(FutureLineStorage s) {
+		public DictImplFactoryImpl(FutureLineStorage s) {
 			this.s = s;
 		}
 

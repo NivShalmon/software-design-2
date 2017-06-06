@@ -5,8 +5,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface Bag<T> {
 	
-	public void add(T s);
-	public void addAll(Collection<? super T> ss);
+	public void add(T t);
+	public void addAll(Collection<? extends T> ts);
 	public void store();
-	public CompletableFuture<Boolean> isIn(T s);
+	public CompletableFuture<Boolean> isIn(T t);
 }
