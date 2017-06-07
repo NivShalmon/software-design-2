@@ -3,6 +3,7 @@ package il.ac.technion.cs.sd.buy.app;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -71,10 +72,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<Long> getTotalAmountSpentByUser(String s0) {
-
 		return null;
-		// return userIdToOrderIdsList.find(s0).thenAcceptBoth(other, action)
-		// .thenApply(lst ->
+		// userIdToOrderIdsList.find(s0).thenApply(lst ->
 		// !lst.isPresent() ? Long.parseLong("0") :lst.get().stream().mapToLong(
 		// s -> orderIdToOrder.find(s).thenApply(o ->
 		// o.get().isCancelled() ? Long.parseLong("0"):
@@ -84,10 +83,13 @@ public class BuyProductReaderImpl implements BuyProductReader {
 		//
 	}
 
-	static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> com) {
-		return CompletableFuture.allOf(com.toArray(new CompletableFuture[com.size()]))
-				.thenApply(v -> com.stream().map(CompletableFuture::join).collect(Collectors.toList()));
-	}
+	// static <T> CompletableFuture<Optional<List<T>>>
+	// sequence(CompletableFuture<Optional<List<T>>> com) {
+	// return CompletableFuture.allOf(com.toArray(new
+	// CompletableFuture[com.size()]))
+	// .thenApply(v ->
+	// com.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+	// }
 
 	@Override
 	public CompletableFuture<List<String>> getUsersThatPurchased(String s0) {
