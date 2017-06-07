@@ -7,17 +7,19 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	private Dict<String, Order> orderIdToOrder; // map orderId ----> Order
-	private Dict<String, List<String>> userIdToOrderIdsList; // map userId ---->
-																// Orders Ids
-	private Dict<String, List<String>> productIdToOrderIdsList; // map productId
-																// ----> Orders
-																// Ids
+	@SuppressWarnings("unused")
+	private Dict<String, String> productIdToPrice;
+	private Dict<String, Order> orderIdToOrder;
+	private Dict<String, List<String>> userIdToOrderIdsList;
+	@SuppressWarnings("unused")
+	private Dict<String, List<String>> productIdToOrderIdsList;
+	private Dict<String, List<Integer>> orderIdToHistory;
 
 	@Override
 	public CompletableFuture<Boolean> isValidOrderId(String s0) {
@@ -51,18 +53,15 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<OptionalInt> getNumberOfProductOrdered(String s0) {
-
 		return orderIdToOrder.find(s0)
 				.thenApply(o -> !o.isPresent() ? OptionalInt.empty()
 						: o.get().isCancelled() ? OptionalInt.of(-1 * Integer.parseInt(o.get().getAmount()))
 								: OptionalInt.of(Integer.parseInt(o.get().getAmount())));
-
 	}
 
 	@Override
 	public CompletableFuture<List<Integer>> getHistoryOfOrder(String s0) {
-		// TODO Dor Add & Think about that
-		return null;
+		return orderIdToHistory.find(s0).thenApply(o -> !o.isPresent() ? new ArrayList<Integer>() : o.get());
 	}
 
 	@Override
@@ -72,13 +71,26 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<Long> getTotalAmountSpentByUser(String s0) {
-		// TODO Auto-generated method stub
+
 		return null;
+		// return userIdToOrderIdsList.find(s0).thenAcceptBoth(other, action)
+		// .thenApply(lst ->
+		// !lst.isPresent() ? Long.parseLong("0") :lst.get().stream().mapToLong(
+		// s -> orderIdToOrder.find(s).thenApply(o ->
+		// o.get().isCancelled() ? Long.parseLong("0"):
+		// Long.parseLong(o.get().getAmount())*
+		// (productIdToProce.find(s).thenAccept(p -> !p.isPresent() ?
+		// Long.parseLong("0"): Long.parseLong(p.get())).get()))).sum());
+		//
+	}
+
+	static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> com) {
+		return CompletableFuture.allOf(com.toArray(new CompletableFuture[com.size()]))
+				.thenApply(v -> com.stream().map(CompletableFuture::join).collect(Collectors.toList()));
 	}
 
 	@Override
 	public CompletableFuture<List<String>> getUsersThatPurchased(String s0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
