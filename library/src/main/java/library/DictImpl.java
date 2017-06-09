@@ -10,11 +10,6 @@ import com.google.inject.Inject;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
-/**
- * Implements a basic dictionary using a {@link LineStorage} and binary search.
- * Allows adding values until a {@link DictImpl#store()} is performed, after which
- * data is stored persistently.
- */
 public class DictImpl<K, V> implements Dict<K,V>{
 	private	final CompletableFuture<FutureLineStorage> storer; 
 	private Map<K, V> pairs = new HashMap<>();
@@ -31,10 +26,6 @@ public class DictImpl<K, V> implements Dict<K,V>{
 		this.valueParser = valueParser;
 	}
 
-	/**
-	 * Performs the persistent write using the {@link LineStorage}, and prevents further writes
-	 * to the {@link DictImpl} 
-	 */
 	public void store(){
 		pairs.keySet().stream().sorted().forEachOrdered(key -> {
 			storer.thenAccept(s-> s.appendLine(keySerializer.apply(key)));
@@ -42,28 +33,14 @@ public class DictImpl<K, V> implements Dict<K,V>{
 		});
 	}
 
-	/**
-	 * adds a pair to the Dict. Should only be called before a store operation
-	 * Does not save the data persistently.
-	 */
 	public void add(K key, V value) {
 		pairs.put(key, value);
 	}
 
-	/**
-	 * adds pairs to the Dict. Should only be called before a store operation
-	 * Does not save the data persistently.
-	 */
 	public void addAll(Map<K, V> ps) {
 		pairs.putAll(ps);
 	}
 
-	/**
-	 * @param key
-	 *            the key to be searched in the dictionary
-	 * @return the value that matches key or {@link Optional.empty} otherwise.
-	 * @throws InterruptedException
-	 */
 	public CompletableFuture<Optional<V>> find(K key) {
 		return BinarySearch.valueOf(storer, keySerializer.apply(key), 0, storer.thenCompose(s->s.numberOfLines()))//
 				.thenApply(o -> o.map(valueParser));

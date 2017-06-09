@@ -7,8 +7,9 @@ import java.util.function.Function;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
 class BinarySearch {
+	
 	/**
-	 * a vesrion of valueOf where the high parameter is also
+	 * a version of valueOf where the high parameter is also
 	 * a completable future, to allow using {@link FutureLineStorage#numberOfLines()}
 	 * as the high value 
 	 * @see {@link #valueOf(CompletableFuture, String, int, int)}

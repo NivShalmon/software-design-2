@@ -6,6 +6,9 @@ import com.google.inject.Inject;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
+/**
+ * A factory for creating {@link DictImpl}
+ */
 public abstract class DictImplFactory<K, V> {
 	Function<K, String> keySerializer = k -> k.toString();
 	Function<V, String> valueSerializer = v -> v.toString();
