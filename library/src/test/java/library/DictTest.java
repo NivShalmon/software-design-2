@@ -14,10 +14,11 @@ import com.google.inject.Injector;
 @SuppressWarnings("unchecked")
 public class DictTest {
 	static Injector injector = Guice.createInjector(new TestLineStorageModule());
-	static DictImplFactory<String, String> f;
+	static DictFactory<String, String> f;
 	{
-		f = injector.getInstance(DictImplFactory.class);
+		f = injector.getInstance(DictFactory.class);
 		f.setValueParser(s -> s);
+		f.setName("test");
 	}
 
 	@Test()
