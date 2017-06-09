@@ -11,6 +11,15 @@ public class Order {
 	private String product_id;
 	private String amount;
 	private String user_id;
+	private String price;
+
+	public String getPrice() {
+		return price;
+	}
+
+	public void setPrice(String price) {
+		this.price = price;
+	}
 
 	public Order(String kind, String product_id, String amount, String user_id) {
 		this.kind = kind;

@@ -10,17 +10,29 @@ import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import com.google.inject.Inject;
+
 import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	@SuppressWarnings("unused")
-	private Dict<String, String> productIdToPrice;
+	// private Dict<String, String> productIdToPrice;
 	private Dict<String, Order> orderIdToOrder;
-	private Dict<String, List<String>> userIdToOrderIdsList;
-	@SuppressWarnings("unused")
-	private Dict<String, List<String>> productIdToOrderIdsList;
+	private Dict<String, List<String>> userIdToOrderIds;
+	private Dict<String, List<String>> productIdToOrderIds;
 	private Dict<String, List<Integer>> orderIdToHistory;
+
+	@Inject
+	public BuyProductReaderImpl(Dict<String, String> productIdToPrice, Dict<String, Order> orderIdToOrder,
+			Dict<String, List<String>> userIdToOrderIds, Dict<String, List<String>> productIdToOrderIds,
+			Dict<String, List<Integer>> orderIdToHistory) {
+		super();
+		// this.productIdToPrice = productIdToPrice;
+		this.orderIdToOrder = orderIdToOrder;
+		this.userIdToOrderIds = userIdToOrderIds;
+		this.productIdToOrderIds = productIdToOrderIds;
+		this.orderIdToHistory = orderIdToHistory;
+	}
 
 	@Override
 	public CompletableFuture<Boolean> isValidOrderId(String s0) {
@@ -67,33 +79,39 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsForUser(String s0) {
-		return userIdToOrderIdsList.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>() : lst.get());
+		return userIdToOrderIds.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>() : lst.get());
 	}
 
 	@Override
 	public CompletableFuture<Long> getTotalAmountSpentByUser(String s0) {
-		return null;
-		// userIdToOrderIdsList.find(s0).thenApply(lst ->
-		// !lst.isPresent() ? Long.parseLong("0") :lst.get().stream().mapToLong(
-		// s -> orderIdToOrder.find(s).thenApply(o ->
-		// o.get().isCancelled() ? Long.parseLong("0"):
-		// Long.parseLong(o.get().getAmount())*
-		// (productIdToProce.find(s).thenAccept(p -> !p.isPresent() ?
-		// Long.parseLong("0"): Long.parseLong(p.get())).get()))).sum());
-		//
+
+		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
+					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
+			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
+					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			return orders.thenApply(ordersLst -> ordersLst.stream().filter(order -> !order.isCancelled())
+					.mapToLong(order -> Long.parseLong(order.getAmount()) * Long.parseLong(order.getPrice())).sum());
+		});
+
 	}
 
-	// static <T> CompletableFuture<Optional<List<T>>>
-	// sequence(CompletableFuture<Optional<List<T>>> com) {
-	// return CompletableFuture.allOf(com.toArray(new
-	// CompletableFuture[com.size()]))
-	// .thenApply(v ->
-	// com.stream().map(CompletableFuture::join).collect(Collectors.toList()));
-	// }
+	static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> com) {
+		return CompletableFuture.allOf(com.toArray(new CompletableFuture[com.size()]))
+				.thenApply(v -> com.stream().map(CompletableFuture::join).collect(Collectors.toList()));
+	}
 
+	// list of users that purchased this product
 	@Override
 	public CompletableFuture<List<String>> getUsersThatPurchased(String s0) {
-		return null;
+		return productIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
+					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
+			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
+					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			return orders.thenApply(lst -> lst.stream().filter(order -> !order.isCancelled())
+					.map(order -> order.getUser_id()).distinct().collect(Collectors.toList()));
+		});
 	}
 
 	@Override
