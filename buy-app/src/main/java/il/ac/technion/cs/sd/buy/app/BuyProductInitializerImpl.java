@@ -17,6 +17,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.google.inject.Inject;
+
 import library.Dict;
 import library.DoubleKeyDict;
 
@@ -27,7 +29,6 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
 	private Map<String, Order> tmpOrderIdToOrder;
-
 	private Map<String, List<String>> tmoUserIdToOrderIds;
 	private Map<String, List<String>> tmoProductIdToOrderIds;
 	private Map<String, List<Integer>> tmpOrderIdToHistory;
@@ -40,6 +41,28 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 	private Dict<String, List<String>> productIdToOrderIds;
 	private Dict<String, List<Integer>> orderIdToHistory;
 	private DoubleKeyDict<String, String, Long> UserProductAmount;
+
+	@Inject
+	public BuyProductInitializerImpl(Dict<String, Order> orderIdToOrder, Dict<String, List<String>> userIdToOrderIds,
+			Dict<String, List<String>> productIdToOrderIds, Dict<String, List<Integer>> orderIdToHistory,
+			DoubleKeyDict<String, String, Long> userProductAmount) {
+		this();
+
+		this.orderIdToOrder = orderIdToOrder;
+		this.userIdToOrderIds = userIdToOrderIds;
+		this.productIdToOrderIds = productIdToOrderIds;
+		this.orderIdToHistory = orderIdToHistory;
+		UserProductAmount = userProductAmount;
+
+	}
+
+	public BuyProductInitializerImpl() {
+		tmpOrderIdToOrder = new HashMap<>();
+		tmoUserIdToOrderIds = new HashMap<>();
+		tmoProductIdToOrderIds = new HashMap<>();
+		tmpOrderIdToHistory = new HashMap<>();
+		tmpProductIdToPrice = new HashMap<>();
+	}
 
 	@Override
 	public CompletableFuture<Void> setupXml(String s0) {
@@ -89,8 +112,8 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					}
 				}
 			}
-			System.out.println(tmpProductIdToPrice);
-			System.out.println(tmpOrderIdToOrder);
+			initialStructures();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -136,13 +159,18 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					tmpOrderIdToOrder.put(order_id, new Order(kind, product_id, amount, user_id));
 				}
 			}
-			System.out.println(tmpProductIdToPrice);
-			System.out.println(tmpOrderIdToOrder);
 
+			initialStructures();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void initialStructures() {
+
+		System.out.println(tmpProductIdToPrice);
+		System.out.println(tmpOrderIdToOrder);
 	}
 
 }
