@@ -172,12 +172,14 @@ public class BuyProductReaderImpl implements BuyProductReader {
 		});
 	}
 
+	// TODO Dor
 	@Override
 	public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String s0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	// TODO Dor
 	@Override
 	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String s0) {
 		// TODO Auto-generated method stub
