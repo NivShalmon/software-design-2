@@ -29,13 +29,11 @@ public class InitializerTest {
 
 	}
 
-
 	@Test
 	public void testJson0() {
 		Scanner scanner;
 		try {
-			scanner = new Scanner(
-					new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small.json"));
+			scanner = new Scanner(new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small.json"));
 			String text = scanner.useDelimiter("\\A").next();
 			scanner.close();
 			BuyProductInitializer init = new BuyProductInitializerImpl();
@@ -47,7 +45,7 @@ public class InitializerTest {
 		}
 
 	}
-	
+
 	@Test
 	public void testJson1() {
 		Scanner scanner;

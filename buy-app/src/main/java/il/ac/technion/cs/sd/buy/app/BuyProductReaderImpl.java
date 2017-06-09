@@ -179,7 +179,6 @@ public class BuyProductReaderImpl implements BuyProductReader {
 		return UserProductAmount.findByMainKey(s0);
 	}
 
-	// TODO Dor
 	@Override
 	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String s0) {
 		return UserProductAmount.findBySecondaryKey(s0);

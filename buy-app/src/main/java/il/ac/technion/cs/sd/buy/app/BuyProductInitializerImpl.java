@@ -25,6 +25,8 @@ import library.DoubleKeyDict;
 
 import org.w3c.dom.Node;
 
+@SuppressWarnings("unused")
+
 public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
@@ -84,41 +86,28 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					tmpProductIdToPrice.put(id, price);
 					i += 2;
 				} else if (!element.getNodeName().equals("Root")) {
-					String kind = element.getNodeName();
+					String status = element.getNodeName();
 					String user_id = null;
 					String order_id = null;
 					String product_id = null;
 					String amount = null;
-					if (kind.equals("CancelOrder")) {
+					if (status.equals("CancelOrder")) {
 						order_id = element.getElementsByTagName("order-id").item(0).getTextContent();
-						if (tmpOrderIdToOrder.containsKey(order_id)) {
-							tmpOrderIdToOrder.get(order_id).setStatus("cancel");
-							if (!tmpOrderIdToOrder.get(order_id).isCancelled())
-								tmpOrderIdToHistory.get(order_id).add(-1);
-						}
+						CancellOrder(order_id);
+
 					}
-					if (kind.equals("ModifyOrder")) {
+					if (status.equals("ModifyOrder")) {
 						order_id = element.getElementsByTagName("order-id").item(0).getTextContent();
 						amount = element.getElementsByTagName("new-amount").item(0).getTextContent();
-						if (tmpOrderIdToOrder.containsKey(order_id)) {
-							tmpOrderIdToOrder.get(order_id).setStatus("modified");
-							tmpOrderIdToOrder.get(order_id).setAmount(amount);
-							tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+						ModifyOrder(order_id, amount);
 
-						}
 					}
-					if (kind.equals("Order")) {
+					if (status.equals("Order")) {
 						order_id = element.getElementsByTagName("order-id").item(0).getTextContent();
 						user_id = element.getElementsByTagName("user-id").item(0).getTextContent();
 						product_id = element.getElementsByTagName("product-id").item(0).getTextContent();
 						amount = element.getElementsByTagName("amount").item(0).getTextContent();
-						tmpOrderIdToOrder.put(order_id, new Order(kind, product_id, amount, user_id));
-						if (tmpUserIdToOrderIds.get(user_id) == null)
-							tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
-						tmpUserIdToOrderIds.get(user_id).add(order_id);
-
-						tmpOrderIdToHistory.put(order_id, new ArrayList<>());
-						tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+						addOrder(order_id, user_id, product_id, amount, status);
 						i += 4;
 					}
 				}
@@ -138,46 +127,32 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			final JSONObject obj = new JSONObject(s0.replace("[", "{ \"arr\":[").replaceAll("]", "]}"));
 			final JSONArray arr = obj.getJSONArray("arr");
 			for (int i = 0; i < arr.length(); i++) {
-				String kind = ((JSONObject) arr.get(i)).getString("type");
+				String status = ((JSONObject) arr.get(i)).getString("type");
 				String user_id = null;
 				String order_id = null;
 				String product_id = null;
 				String amount = null;
-				if (kind.equals("product")) {
+				if (status.equals("product")) {
 					String id = ((JSONObject) arr.get(i)).getString("id");
 					String price = ((JSONObject) arr.get(i)).getString("price");
 					tmpProductIdToPrice.put(id, price);
 				}
-				if (kind.equals("cancel-order")) {
+				if (status.equals("cancel-order")) {
 					order_id = ((JSONObject) arr.get(i)).getString("order-id");
-					if (tmpOrderIdToOrder.containsKey(order_id)) {
-						tmpOrderIdToOrder.get(order_id).setStatus("cancel");
-						if (!tmpOrderIdToOrder.get(order_id).isCancelled())
-							tmpOrderIdToHistory.get(order_id).add(-1);
-					}
-					continue;
+					CancellOrder(order_id);
 				}
-				if (kind.equals("modify-order")) {
+				if (status.equals("modify-order")) {
 					order_id = ((JSONObject) arr.get(i)).getString("order-id");
 					amount = ((JSONObject) arr.get(i)).getString("amount");
-					if (tmpOrderIdToOrder.containsKey(order_id)) {
-						tmpOrderIdToOrder.get(order_id).setStatus("modified");
-						tmpOrderIdToOrder.get(order_id).setAmount(amount);
-						tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
-					}
+					ModifyOrder(order_id, amount);
+
 				}
-				if (kind.equals("order")) {
+				if (status.equals("order")) {
 					order_id = ((JSONObject) arr.get(i)).getString("order-id");
 					user_id = ((JSONObject) arr.get(i)).getString("user-id");
 					product_id = ((JSONObject) arr.get(i)).getString("product-id");
 					amount = ((JSONObject) arr.get(i)).getString("amount");
-					tmpOrderIdToOrder.put(order_id, new Order(kind, product_id, amount, user_id));
-					if (tmpUserIdToOrderIds.get(user_id) == null)
-						tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
-					tmpUserIdToOrderIds.get(user_id).add(order_id);
-
-					tmpOrderIdToHistory.put(order_id, new ArrayList<>());
-					tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+					addOrder(order_id, user_id, product_id, amount, status);
 				}
 			}
 
@@ -186,6 +161,31 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void addOrder(String order_id, String user_id, String product_id, String amount, String status) {
+		tmpOrderIdToOrder.put(order_id, new Order(status, product_id, amount, user_id));
+		if (tmpUserIdToOrderIds.get(user_id) == null)
+			tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
+		tmpUserIdToOrderIds.get(user_id).add(order_id);
+		tmpOrderIdToHistory.put(order_id, new ArrayList<>());
+		tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+	}
+
+	private void CancellOrder(String order_id) {
+		if (tmpOrderIdToOrder.containsKey(order_id) && !tmpOrderIdToOrder.get(order_id).isCancelled()) {
+			tmpOrderIdToOrder.get(order_id).setStatus("cancel");
+			tmpOrderIdToHistory.get(order_id).add(-1);
+		}
+	}
+
+	private void ModifyOrder(String order_id, String amount) {
+		if (tmpOrderIdToOrder.containsKey(order_id)) {
+			tmpOrderIdToOrder.get(order_id).setStatus("modified");
+			tmpOrderIdToOrder.get(order_id).setAmount(amount);
+			tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+
+		}
 	}
 
 	private void initialStructures() {
