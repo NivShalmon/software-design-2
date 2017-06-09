@@ -16,7 +16,7 @@ import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	//private Dict<String, String> productIdToPrice;
+	// private Dict<String, String> productIdToPrice;
 	private Dict<String, Order> orderIdToOrder;
 	private Dict<String, List<String>> userIdToOrderIds;
 	private Dict<String, List<String>> productIdToOrderIds;
@@ -27,7 +27,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 			Dict<String, List<String>> userIdToOrderIds, Dict<String, List<String>> productIdToOrderIds,
 			Dict<String, List<Integer>> orderIdToHistory) {
 		super();
-		this.productIdToPrice = productIdToPrice;
+		// this.productIdToPrice = productIdToPrice;
 		this.orderIdToOrder = orderIdToOrder;
 		this.userIdToOrderIds = userIdToOrderIds;
 		this.productIdToOrderIds = productIdToOrderIds;
