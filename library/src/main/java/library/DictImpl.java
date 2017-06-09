@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import com.google.inject.Inject;
@@ -34,11 +33,9 @@ public class DictImpl<K, V> implements Dict<K,V>{
 
 	/**
 	 * Performs the persistent write using the {@link LineStorage}, and prevents further writes
-	 * to the {@link DictImpl}
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * to the {@link DictImpl} 
 	 */
-	public void store() throws Exception {
+	public void store(){
 		pairs.keySet().stream().sorted().forEachOrdered(key -> {
 			storer.thenAccept(s-> s.appendLine(keySerializer.apply(key)));
 			storer.thenAccept(s->s.appendLine(valueSerializer.apply(pairs.get(key))));

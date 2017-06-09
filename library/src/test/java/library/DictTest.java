@@ -4,6 +4,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class DictTest {
 	}
 
 	@Test()
-	public void test0() throws Exception {
+	public void test0() throws InterruptedException, ExecutionException {
 		Dict<String, String> testDict = f.create();
 		testDict.add("a", "Dor");
 		testDict.add("b", "Niv");

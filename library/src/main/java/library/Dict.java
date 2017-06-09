@@ -16,7 +16,7 @@ public interface Dict<K,V> {
 	 * to the {@link Dict}
 	 * @throws Exception 
 	 */
-	public void store() throws Exception;
+	public void store();
 
 	/**
 	 * adds a pair to the Dict. Should only be called before a store operation
