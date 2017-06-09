@@ -1,6 +1,7 @@
 package il.ac.technion.cs.sd.buy.app;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +25,12 @@ import library.DoubleKeyDict;
 
 import org.w3c.dom.Node;
 
-@SuppressWarnings("unused")
 public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
 	private Map<String, Order> tmpOrderIdToOrder;
-	private Map<String, List<String>> tmoUserIdToOrderIds;
-	private Map<String, List<String>> tmoProductIdToOrderIds;
+	private Map<String, List<String>> tmpUserIdToOrderIds;
+	private Map<String, List<String>> tmpProductIdToOrderIds;
 	private Map<String, List<Integer>> tmpOrderIdToHistory;
 	private Map<String, String> tmpProductIdToPrice;
 
@@ -58,8 +58,8 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	public BuyProductInitializerImpl() {
 		tmpOrderIdToOrder = new HashMap<>();
-		tmoUserIdToOrderIds = new HashMap<>();
-		tmoProductIdToOrderIds = new HashMap<>();
+		tmpUserIdToOrderIds = new HashMap<>();
+		tmpProductIdToOrderIds = new HashMap<>();
 		tmpOrderIdToHistory = new HashMap<>();
 		tmpProductIdToPrice = new HashMap<>();
 	}
@@ -108,6 +108,9 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 						product_id = element.getElementsByTagName("product-id").item(0).getTextContent();
 						amount = element.getElementsByTagName("amount").item(0).getTextContent();
 						tmpOrderIdToOrder.put(order_id, new Order(kind, product_id, amount, user_id));
+						if (tmpUserIdToOrderIds.get(user_id) == null)
+							tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
+						tmpUserIdToOrderIds.get(user_id).add(order_id);
 						i += 4;
 					}
 				}
@@ -157,6 +160,9 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					product_id = ((JSONObject) arr.get(i)).getString("product-id");
 					amount = ((JSONObject) arr.get(i)).getString("amount");
 					tmpOrderIdToOrder.put(order_id, new Order(kind, product_id, amount, user_id));
+					if (tmpUserIdToOrderIds.get(user_id) == null)
+						tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
+					tmpUserIdToOrderIds.get(user_id).add(order_id);
 				}
 			}
 
@@ -171,6 +177,19 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		System.out.println(tmpProductIdToPrice);
 		System.out.println(tmpOrderIdToOrder);
+
+		orderIdToOrder.addAll(tmpOrderIdToOrder);
+		userIdToOrderIds.addAll(tmpUserIdToOrderIds);
+		productIdToOrderIds.addAll(tmpProductIdToOrderIds);
+		orderIdToHistory.addAll(tmpOrderIdToHistory);
+
+		// TODO : dor UserProductAmount.;
+
+		orderIdToOrder.store();
+		userIdToOrderIds.store();
+		productIdToOrderIds.store();
+		orderIdToHistory.store();
+
 	}
 
 }
