@@ -17,17 +17,16 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
  * data is stored persistently.
  */
 public class Dict<K, V> {
-	private	final CompletableFuture<FutureLineStorage> s; 
-	private FutureLineStorage storer;
+	private	final CompletableFuture<FutureLineStorage> storer; 
 	private Map<K, V> pairs = new HashMap<>();
 	private Function<K, String> keySerializer;
 	private Function<V, String> valueSerializer;
 	private Function<String, V> valueParser;
 
 	@Inject
-	Dict(CompletableFuture<FutureLineStorage> s, Function<K, String> keySerializer, Function<V, String> valueSerializer,
+	Dict(CompletableFuture<FutureLineStorage> storer, Function<K, String> keySerializer, Function<V, String> valueSerializer,
 			Function<String, V> valueParser) {
-		this.s = s;
+		this.storer = storer;
 		this.keySerializer = keySerializer;
 		this.valueSerializer = valueSerializer;
 		this.valueParser = valueParser;
@@ -40,10 +39,9 @@ public class Dict<K, V> {
 	 * @throws InterruptedException 
 	 */
 	public void store() throws InterruptedException, ExecutionException {
-		storer = s.get();
 		pairs.keySet().stream().sorted().forEachOrdered(key -> {
-			storer.appendLine(keySerializer.apply(key));
-			storer.appendLine(valueSerializer.apply(pairs.get(key)));
+			storer.thenAccept(s-> s.appendLine(keySerializer.apply(key)));
+			storer.thenAccept(s->s.appendLine(valueSerializer.apply(pairs.get(key))));
 		});
 	}
 
@@ -70,7 +68,7 @@ public class Dict<K, V> {
 	 * @throws InterruptedException
 	 */
 	public CompletableFuture<Optional<V>> find(K key) {
-		return BinarySearch.valueOf(storer, keySerializer.apply(key), 0, storer.numberOfLines())//
+		return BinarySearch.valueOf(storer, keySerializer.apply(key), 0, storer.thenCompose(s->s.numberOfLines()))//
 				.thenApply(o -> o.map(valueParser));
 	}
 }
