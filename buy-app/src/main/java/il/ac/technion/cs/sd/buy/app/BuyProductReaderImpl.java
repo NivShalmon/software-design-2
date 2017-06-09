@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import com.google.inject.Inject;
 
 import library.Dict;
+import library.DoubleKeyDict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
@@ -20,6 +21,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	private Dict<String, List<String>> userIdToOrderIds;
 	private Dict<String, List<String>> productIdToOrderIds;
 	private Dict<String, List<Integer>> orderIdToHistory;
+	private DoubleKeyDict<String, String, Long> UserProductAmount;
 
 	@Inject
 	public BuyProductReaderImpl(Dict<String, String> productIdToPrice, Dict<String, Order> orderIdToOrder,
@@ -172,18 +174,15 @@ public class BuyProductReaderImpl implements BuyProductReader {
 		});
 	}
 
-	// TODO Dor
 	@Override
 	public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		return UserProductAmount.findByMainKey(s0);
 	}
 
 	// TODO Dor
 	@Override
 	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		return UserProductAmount.findBySecondaryKey(s0);
 	}
 
 }
