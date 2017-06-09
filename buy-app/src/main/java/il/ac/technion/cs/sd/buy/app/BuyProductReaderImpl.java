@@ -116,14 +116,24 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsThatPurchased(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		return productIdToOrderIds.find(s0)
+				.thenApply(orderIds -> !orderIds.isPresent() ? new ArrayList<String>() : orderIds.get());
 	}
 
+	// items that were purchased by a given product id
 	@Override
 	public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
+					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
+			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
+					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			return orders
+					.thenApply(ordersLst -> OptionalLong.of(ordersLst.stream().filter(order -> !order.isCancelled())
+							.mapToLong(order -> Long.parseLong(order.getAmount())).sum()));
+		});
+
 	}
 
 	@Override
