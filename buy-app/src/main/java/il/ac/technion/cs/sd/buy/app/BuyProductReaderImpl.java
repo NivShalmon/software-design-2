@@ -16,7 +16,6 @@ import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	// TODO: sort everything lexicography
 	private Dict<String, Order> orderIdToOrder;
 	private Dict<String, List<String>> userIdToOrderIds;
 	private Dict<String, List<String>> productIdToOrderIds;
@@ -86,10 +85,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	public CompletableFuture<Long> getTotalAmountSpentByUser(String s0) {
 
 		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
-			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
-					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
-			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
-					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
 			return orders.thenApply(ordersLst -> ordersLst.stream().filter(order -> !order.isCancelled())
 					.mapToLong(order -> Long.parseLong(order.getAmount()) * Long.parseLong(order.getPrice())).sum());
 		});
@@ -105,10 +101,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<List<String>> getUsersThatPurchased(String s0) {
 		return productIdToOrderIds.find(s0).thenCompose(orderIds -> {
-			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
-					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
-			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
-					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
 			return orders.thenApply(lst -> lst.stream().filter(order -> !order.isCancelled())
 					.map(order -> order.getUser_id()).distinct().sorted().collect(Collectors.toList()));
 		});
@@ -116,10 +109,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	public CompletableFuture<Integer> getUsersThatPurchasedAndNotCanecelled(String s0) {
 		return productIdToOrderIds.find(s0).thenCompose(orderIds -> {
-			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
-					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
-			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
-					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
 			return orders.thenApply(
 					lst -> lst.stream().filter(order -> !order.isCancelled()).collect(Collectors.toList()).size());
 		});
@@ -136,10 +126,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String s0) {
 
 		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
-			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
-					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
-			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
-					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
 			return orders
 					.thenApply(ordersLst -> OptionalLong.of(ordersLst.stream().filter(order -> !order.isCancelled())
 							.mapToLong(order -> Long.parseLong(order.getAmount())).sum()));
@@ -156,14 +143,33 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<OptionalDouble> getCancelRatioForUser(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+
+		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
+			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
+			CompletableFuture<Integer> cancelled = orders
+					.thenApply(o -> o.stream().filter(i -> i.isCancelled()).collect(Collectors.toList()).size());
+			return total.thenCombine(cancelled, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : c / t));
+		});
+
+	}
+
+	private CompletableFuture<List<Order>> getOrders(Optional<List<String>> orderIds) {
+		List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
+				.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
+		return sequence(tmpOrders)
+				.thenApply(l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
 	}
 
 	@Override
 	public CompletableFuture<OptionalDouble> getModifyRatioForUser(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			CompletableFuture<List<Order>> orders = getOrders(orderIds);
+			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
+			CompletableFuture<Integer> modified = orders
+					.thenApply(o -> o.stream().filter(i -> i.isModified()).collect(Collectors.toList()).size());
+			return total.thenCombine(modified, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : c / t));
+		});
 	}
 
 	@Override
