@@ -43,24 +43,4 @@ class BinarySearch {
 			}
 		});
 	}
-	/**
-	 * a vesrion of isIn where the high parameter is also
-	 * a completable future, to allow using {@link FutureLineStorage#numberOfLines()}
-	 * as the high value 
-	 * @see {@link #isIn(FutureLineStorage, String, int, int)}
-	 */
-	static CompletableFuture<Boolean> isIn(FutureLineStorage storer, String key, int low, CompletableFuture<Integer> high){
-		return high.thenCompose(h -> isIn(storer,key,low,h));
-	}
-	/**
-	 * performs an efficient binary search on a {@link FutureLineStorage}
-	 * @param storer the {@link FutureLineStorage}
-	 * @param key the key to be searched
-	 * @param low the line number to begin searching from
-	 * @param high the line number to stop searching at
-	 * @return true iff key is stored in the storer
-	 */
-	static CompletableFuture<Boolean> isIn(FutureLineStorage storer, String key, int low, int high){
-		return CompletableFuture.completedFuture(false);
-	}
 }
