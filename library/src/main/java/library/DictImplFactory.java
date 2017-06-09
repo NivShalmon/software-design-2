@@ -4,12 +4,13 @@ import java.util.function.Function;
 
 import com.google.inject.Inject;
 
-import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
+import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
 public abstract class DictImplFactory<K, V> {
 	Function<K, String> keySerializer = k -> k.toString();
 	Function<V, String> valueSerializer = v -> v.toString();
 	Function<String, V> valueParser;
+	String name;
 
 	public DictImplFactory<K, V> setKeySerializer(Function<K, String> keySerializer) {
 		if(keySerializer != null)
@@ -28,22 +29,28 @@ public abstract class DictImplFactory<K, V> {
 			this.valueParser = valueParser;
 		return this;
 	}
+	
+	public DictImplFactory<K, V> setName(String name){
+		if (name != null)
+			this.name = name;
+		return this;
+	}
 
 	public abstract Dict<K, V> create();
 
 	public static class DictImplFactoryImpl<K,V> extends DictImplFactory<K,V> {
-		private FutureLineStorage s;
+		private FutureLineStorageFactory s;
 
 		@Inject
-		public DictImplFactoryImpl(FutureLineStorage s) {
+		public DictImplFactoryImpl(FutureLineStorageFactory s) {
 			this.s = s;
 		}
 
 		@Override
 		public Dict<K, V> create() {
-			if (valueParser == null)
+			if (valueParser == null || name == null)
 				throw new IllegalStateException();
-			return new DictImpl<K,V>(s, keySerializer, valueSerializer, valueParser);
+			return new DictImpl<K,V>(s.open(name), keySerializer, valueSerializer, valueParser);
 		}
 
 	}

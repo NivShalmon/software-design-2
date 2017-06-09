@@ -18,6 +18,7 @@ public class DictTest {
 	{
 		f = injector.getInstance(DictImplFactory.class);
 		f.setValueParser(s -> s);
+		f.setName("test");
 	}
 
 	@Test()
@@ -31,7 +32,7 @@ public class DictTest {
 	}
 
 	@Test()
-	public void test1() throws InterruptedException, ExecutionException {
+	public void test1() throws Exception {
 		Dict<String, String> testDict = f.create();
 		testDict.add("a", "Dor");
 		testDict.store();
@@ -40,7 +41,7 @@ public class DictTest {
 	}
 
 	@Test()
-	public void test2() throws InterruptedException, ExecutionException {
+	public void test2() throws Exception {
 		Dict<String, String> testDict = f.create();
 		for (int i = 0; i < 3339; i++) {
 			testDict.add(i + "", i + "");
@@ -51,7 +52,7 @@ public class DictTest {
 	}
 
 	@Test()
-	public void test3() throws InterruptedException, ExecutionException {
+	public void test3() throws Exception {
 		Dict<String, String> testDict = f.create();
 		testDict.add("b", "Niv");
 		testDict.add("a", "Dor");

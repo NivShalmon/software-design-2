@@ -14,6 +14,7 @@ public interface Dict<K,V> {
 	/**
 	 * Performs the persistent write using the {@link LineStorage}, and prevents further writes
 	 * to the {@link Dict}
+	 * @throws Exception 
 	 */
 	public void store();
 
