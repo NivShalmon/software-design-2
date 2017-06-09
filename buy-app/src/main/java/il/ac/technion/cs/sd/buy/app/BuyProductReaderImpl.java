@@ -16,7 +16,7 @@ import library.Dict;
 
 public class BuyProductReaderImpl implements BuyProductReader {
 
-	// private Dict<String, String> productIdToPrice;
+	// TODO: sort everything lexicography
 	private Dict<String, Order> orderIdToOrder;
 	private Dict<String, List<String>> userIdToOrderIds;
 	private Dict<String, List<String>> productIdToOrderIds;
@@ -27,7 +27,6 @@ public class BuyProductReaderImpl implements BuyProductReader {
 			Dict<String, List<String>> userIdToOrderIds, Dict<String, List<String>> productIdToOrderIds,
 			Dict<String, List<Integer>> orderIdToHistory) {
 		super();
-		// this.productIdToPrice = productIdToPrice;
 		this.orderIdToOrder = orderIdToOrder;
 		this.userIdToOrderIds = userIdToOrderIds;
 		this.productIdToOrderIds = productIdToOrderIds;
@@ -79,7 +78,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsForUser(String s0) {
-		return userIdToOrderIds.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>() : lst.get());
+		return userIdToOrderIds.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>()
+				: lst.get().stream().sorted().collect(Collectors.toList()));
 	}
 
 	@Override
@@ -110,14 +110,25 @@ public class BuyProductReaderImpl implements BuyProductReader {
 			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
 					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
 			return orders.thenApply(lst -> lst.stream().filter(order -> !order.isCancelled())
-					.map(order -> order.getUser_id()).distinct().collect(Collectors.toList()));
+					.map(order -> order.getUser_id()).distinct().sorted().collect(Collectors.toList()));
+		});
+	}
+
+	public CompletableFuture<Integer> getUsersThatPurchasedAndNotCanecelled(String s0) {
+		return productIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			List<CompletableFuture<Optional<Order>>> tmpOrders = orderIds.orElse(new ArrayList<>()).stream()
+					.map(i -> orderIdToOrder.find(i)).collect(Collectors.toList());
+			CompletableFuture<List<Order>> orders = sequence(tmpOrders).thenApply(
+					l -> l.stream().filter(o -> o.isPresent()).map(o -> o.get()).collect(Collectors.toList()));
+			return orders.thenApply(
+					lst -> lst.stream().filter(order -> !order.isCancelled()).collect(Collectors.toList()).size());
 		});
 	}
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsThatPurchased(String s0) {
-		return productIdToOrderIds.find(s0)
-				.thenApply(orderIds -> !orderIds.isPresent() ? new ArrayList<String>() : orderIds.get());
+		return productIdToOrderIds.find(s0).thenApply(orderIds -> !orderIds.isPresent() ? new ArrayList<String>()
+				: orderIds.get().stream().sorted().collect(Collectors.toList()));
 	}
 
 	// items that were purchased by a given product id
@@ -138,8 +149,9 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<OptionalDouble> getAverageNumberOfItemsPurchased(String s0) {
-		// TODO Auto-generated method stub
-		return null;
+		CompletableFuture<OptionalLong> total = getTotalNumberOfItemsPurchased(s0);
+		CompletableFuture<Integer> size = getUsersThatPurchasedAndNotCanecelled(s0);
+		return total.thenCombine(size, (t, s) -> OptionalDouble.of(s == 0 || !t.isPresent() ? 0 : t.getAsLong() / s));
 	}
 
 	@Override
