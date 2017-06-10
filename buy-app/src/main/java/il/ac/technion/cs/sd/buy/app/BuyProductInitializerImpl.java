@@ -3,6 +3,7 @@ package il.ac.technion.cs.sd.buy.app;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -189,7 +190,9 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		// clear all the old orders
 		Set<String> oids = tmpOrderIdToOrder.keySet();
-		for (String oid : oids) {
+		Set<String> temp = new HashSet<>();
+		temp.addAll(oids);
+		for (String oid : temp) {
 			if (tmpProductIdToPrice.containsKey(tmpOrderIdToOrder.get(oid).getProduct_id())) {
 				tmpOrderIdToOrder.get(oid)
 						.setPrice(tmpProductIdToPrice.get(tmpOrderIdToOrder.get(oid).getProduct_id()));
@@ -208,7 +211,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 				tmpUserIdToOrderIds.put(user, new ArrayList<>());
 
 			if (!tmpProductIdToOrderIds.containsKey(pid))
-				tmpProductIdToOrderIds.put(user, new ArrayList<>());
+				tmpProductIdToOrderIds.put(pid, new ArrayList<>());
 
 			tmpUserIdToOrderIds.get(user).add(oid);
 			tmpProductIdToOrderIds.get(pid).add(oid);

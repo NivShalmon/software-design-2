@@ -42,7 +42,10 @@ public class DictTestImpl implements Dict {
 
 	@Override
 	public CompletableFuture<Optional<String>> find(String key) {
+		if (!m.containsKey(key))
+			return CompletableFuture.completedFuture(Optional.empty());
 		return CompletableFuture.completedFuture(Optional.of(m.get(key)));
+
 	}
 
 }
