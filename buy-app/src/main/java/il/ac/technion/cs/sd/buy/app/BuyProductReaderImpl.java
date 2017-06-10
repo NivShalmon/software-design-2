@@ -207,8 +207,9 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	}
 
 	private static Optional<List<String>> decodeListStringsOptional(Optional<String> encoded) {
-		return Optional.of(Arrays
-				.asList((encoded.get().substring(1).substring(0, encoded.get().substring(1).length() - 1).split(","))));
+		return !encoded.isPresent() ? Optional.of(new ArrayList<>())
+				: Optional.of(Arrays.asList(
+						(encoded.get().substring(1).substring(0, encoded.get().substring(1).length() - 1).split(","))));
 	}
 
 	private static List<Integer> decodeListIntegers(String encoded) {

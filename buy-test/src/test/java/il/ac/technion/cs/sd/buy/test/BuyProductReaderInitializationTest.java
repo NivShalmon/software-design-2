@@ -46,11 +46,8 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getUsersThatPurchased("android").get().size(), 0);
 			assertEquals(reader.getOrderIdsThatPurchased("android").get().size(), 1);
 			assertEquals(reader.getOrderIdsThatPurchased("iphone").get().size(), 0);
-//			assert(!reader.getTotalNumberOfItemsPurchased("android").get().isPresent());
-//			assert(!reader.getTotalNumberOfItemsPurchased("iphone").get().isPresent());
-			
-
-			
+			assertEquals(reader.getTotalNumberOfItemsPurchased("android").get().getAsLong(), 0);
+			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
 
 		} catch (Exception e) {
 			e.printStackTrace();
