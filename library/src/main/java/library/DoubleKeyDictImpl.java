@@ -15,9 +15,10 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 public class DoubleKeyDictImpl implements DoubleKeyDict {
 	private final Dict mainKeyDict;
 	private final Dict secondaryKeyDict;
+	private CompletableFuture<?> storingStatus;
 	private final CompletableFuture<FutureLineStorage> storer;
-	private final Map<String,Map<String,String>> mainKeyMap = new HashMap<>();
-	private final Map<String,Map<String,String>> secondaryKeyMap = new HashMap<>();
+	private final Map<String, Map<String, String>> mainKeyMap = new HashMap<>();
+	private final Map<String, Map<String, String>> secondaryKeyMap = new HashMap<>();
 
 	private class IntegerWrapper {
 		public int val;
@@ -32,7 +33,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	}
 
 	@Inject
-	public DoubleKeyDictImpl(DictImplFactory dictFactory, FutureLineStorageFactory lineStorageFactory,
+	public DoubleKeyDictImpl(DictFactory dictFactory, FutureLineStorageFactory lineStorageFactory,
 			@Assisted String name) {
 		storer = lineStorageFactory.open(name + ".valuesMap");
 		mainKeyDict = dictFactory.create(name + ".mainKeyMap");
@@ -41,8 +42,8 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 
 	@Override
 	public void add(String mainKey, String secondaryKey, String value) {
-		addToMap(mainKeyMap, mainKey, secondaryKey,value);
-		addToMap(secondaryKeyMap, secondaryKey, mainKey,value);
+		addToMap(mainKeyMap, mainKey, secondaryKey, value);
+		addToMap(secondaryKeyMap, secondaryKey, mainKey, value);
 	}
 
 	/**
@@ -51,25 +52,25 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	 */
 	public void store() {
 		IntegerWrapper currentLine = new IntegerWrapper();
-		storeDict(mainKeyDict, mainKeyMap, currentLine);
-		storeDict(secondaryKeyDict, secondaryKeyMap, currentLine);
+		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storer);
+		storingStatus = storeDict(secondaryKeyDict, secondaryKeyMap, currentLine, storingStatus);
 	}
 
-	private void storeDict(final Dict dict, final Map<String, Map<String,String>> m, IntegerWrapper currentLine) {
-		m.keySet().stream().sorted().forEachOrdered(key -> {
+	private CompletableFuture<?> storeDict(final Dict dict, final Map<String, Map<String, String>> m,
+			IntegerWrapper currentLine, CompletableFuture<?> currentStatus) {
+		CompletableFuture<?> status = currentStatus;
+		for (String key : m.keySet()) {
+			Map<String, String> current = m.get(key);
+			status = DictImpl.storeToStorage(current, storer, status);
 			int startingLine = currentLine.val;
-			Map<String,String> current = m.get(key);
-			current.keySet().stream().sorted().forEachOrdered(key2 -> {
-				storer.thenApply(s->s.appendLine(key2));
-				storer.thenApply(s->s.appendLine(current.get(key2)));
-				currentLine.val += 2;
-			});
+			currentLine.val += current.size() * 2;
 			dict.add(key, startingLine + "," + currentLine);
-		});
+		}
 		dict.store();
+		return status;
 	}
 
-	private void addToMap(final Map<String, Map<String,String>> m, String key1, String key2,String value) {
+	private void addToMap(final Map<String, Map<String, String>> m, String key1, String key2, String value) {
 		if (!m.containsKey(key1))
 			m.put(key1, new HashMap<>());
 		m.get(key1).put(key2, value);
@@ -77,7 +78,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 
 	@Override
 	public CompletableFuture<Map<String, String>> findByMainKey(String key) {
-		return findByKey(mainKeyDict,key);
+		return findByKey(mainKeyDict, key);
 	}
 
 	@Override
@@ -86,7 +87,8 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 			if (!o.isPresent())
 				return CompletableFuture.completedFuture(Optional.empty());
 			String[] lines = o.get().split(",");
-			return BinarySearch.valueOf(storer, key2, Integer.parseInt(lines[0]), Integer.parseInt(lines[1]));
+			return storingStatus.thenCompose(
+					v -> BinarySearch.valueOf(storer, key2, Integer.parseInt(lines[0]), Integer.parseInt(lines[1])));
 		});
 	}
 
@@ -96,19 +98,21 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	}
 
 	private CompletableFuture<Map<String, String>> findByKey(Dict d, String key) {
-		return d.find(key).thenApply(o -> o.map(str ->{
-			Map<String,String> $ = new HashMap<>();
+		return d.find(key).thenApply(o -> o.map(str -> {
+			Map<String, String> $ = new HashMap<>();
 			String[] lines = o.get().split(",");
 			int end = Integer.parseInt(lines[1]);
-			for (int i = Integer.parseInt(lines[0]); i < end; i += 2){
-				final int line = i;
-				try {
-					$.put(storer.thenCompose(s->s.read(line)).get(), storer.thenCompose(s->s.read(line+1)).get());
-				} catch (InterruptedException | ExecutionException e) {
-					return new HashMap<String,String>();
+			try {
+				storingStatus.get();
+				for (int i = Integer.parseInt(lines[0]); i < end; i += 2) {
+					final int line = i;
+
+					$.put(storer.thenCompose(s -> s.read(line)).get(), storer.thenCompose(s -> s.read(line + 1)).get());
 				}
+			} catch (InterruptedException | ExecutionException e) {
+				return new HashMap<String, String>();
 			}
 			return $;
-		}).orElse(new HashMap<String,String>()));
+		}).orElse(new HashMap<String, String>()));
 	}
 }

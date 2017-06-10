@@ -45,7 +45,7 @@ TestStorer(){
   
   @Override public CompletableFuture<Void> appendLine(String line) {
    lst.add(line);
-   return null;
+   return CompletableFuture.completedFuture("a").thenAccept(s->{});
   }
   
   @Override public CompletableFuture<String> read(int lineNumber) {
