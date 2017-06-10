@@ -25,8 +25,6 @@ import library.DoubleKeyDict;
 
 import org.w3c.dom.Node;
 
-@SuppressWarnings("unused")
-
 public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
@@ -199,18 +197,39 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		System.out.println("___________");
 
-		// orderIdToOrder.addAll(tmpOrderIdToOrder);
-		// userIdToOrderIds.addAll(tmpUserIdToOrderIds);
-		// productIdToOrderIds.addAll(tmpProductIdToOrderIds);
-		// orderIdToHistory.addAll(tmpOrderIdToHistory);
+		orderIdToOrder.addAll(tmpOrderIdToOrder);
+		userIdToOrderIds.addAll(tmpUserIdToOrderIds);
+		productIdToOrderIds.addAll(tmpProductIdToOrderIds);
+		orderIdToHistory.addAll(tmpOrderIdToHistory);
 
 		// TODO : dor UserProductAmount.;
 
-		// orderIdToOrder.store();
-		// userIdToOrderIds.store();
-		// productIdToOrderIds.store();
-		// orderIdToHistory.store();
+		orderIdToOrder.store();
+		userIdToOrderIds.store();
+		productIdToOrderIds.store();
+		orderIdToHistory.store();
 
+	}
+
+	// Getters for testing the initializer only !
+	public Dict<String, Order> getOrderIdToOrder() {
+		return orderIdToOrder;
+	}
+
+	public Dict<String, List<String>> getUserIdToOrderIds() {
+		return userIdToOrderIds;
+	}
+
+	public Dict<String, List<String>> getProductIdToOrderIds() {
+		return productIdToOrderIds;
+	}
+
+	public Dict<String, List<Integer>> getOrderIdToHistory() {
+		return orderIdToHistory;
+	}
+
+	public DoubleKeyDict<String, String, Long> getUserProductAmount() {
+		return UserProductAmount;
 	}
 
 }
