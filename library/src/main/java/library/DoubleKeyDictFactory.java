@@ -1,6 +1,6 @@
 package library;
 
-public interface DoubleKeyDictImplFactory {
+public interface DoubleKeyDictFactory {
 
 	public DoubleKeyDict create(String name);
 }
