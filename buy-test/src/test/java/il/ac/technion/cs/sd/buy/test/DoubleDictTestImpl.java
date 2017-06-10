@@ -8,10 +8,10 @@ import java.util.concurrent.CompletableFuture;
 import library.DoubleKeyDict;
 
 //
-public class DoubleDictTestImpl<K, T, V> implements DoubleKeyDict<K, T, V> {
+public class DoubleDictTestImpl implements DoubleKeyDict {
 
-	Map<K, Map<T, V>> main;
-	Map<T, Map<K, V>> secondary;
+	Map<String, Map<String, String>> main;
+	Map<String, Map<String, String>> secondary;
 	boolean store;
 
 	public DoubleDictTestImpl() {
@@ -21,7 +21,7 @@ public class DoubleDictTestImpl<K, T, V> implements DoubleKeyDict<K, T, V> {
 	}
 
 	@Override
-	public void add(K mainKey, T secondaryKey, V value) {
+	public void add(String mainKey, String secondaryKey, String value) {
 		if (!this.store) {
 			if (!main.containsKey(mainKey))
 				main.put(mainKey, new HashMap<>());
@@ -40,17 +40,17 @@ public class DoubleDictTestImpl<K, T, V> implements DoubleKeyDict<K, T, V> {
 	}
 
 	@Override
-	public CompletableFuture<Map<T, V>> findByMainKey(K key) {
+	public CompletableFuture<Map<String, String>> findByMainKey(String key) {
 		return CompletableFuture.completedFuture(main.get(key));
 	}
 
 	@Override
-	public CompletableFuture<Optional<V>> findByKeys(K mainKey, T secondaryKey) {
+	public CompletableFuture<Optional<String>> findByKeys(String mainKey, String secondaryKey) {
 		return CompletableFuture.completedFuture(Optional.of(main.get(mainKey).get(secondaryKey)));
 	}
 
 	@Override
-	public CompletableFuture<Map<K, V>> findBySecondaryKey(T key) {
+	public CompletableFuture<Map<String, String>> findBySecondaryKey(String key) {
 		return CompletableFuture.completedFuture(secondary.get(key));
 
 	}

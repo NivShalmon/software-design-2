@@ -8,9 +8,9 @@ import java.util.concurrent.CompletableFuture;
 import library.Dict;
 
 //Local implementation of the library: for testing
-public class DictTestImpl<K, V> implements Dict<K, V> {
+public class DictTestImpl implements Dict {
 
-	Map<K, V> m;
+	Map<String, String> m;
 	boolean isStored;
 
 	public DictTestImpl() {
@@ -25,7 +25,7 @@ public class DictTestImpl<K, V> implements Dict<K, V> {
 	}
 
 	@Override
-	public void add(K key, V value) {
+	public void add(String key, String value) {
 		if (!isStored) {
 			m.put(key, value);
 		}
@@ -33,7 +33,7 @@ public class DictTestImpl<K, V> implements Dict<K, V> {
 	}
 
 	@Override
-	public void addAll(Map<K, V> m) {
+	public void addAll(Map<String, String> m) {
 		if (!isStored) {
 			m.putAll(m);
 		}
@@ -41,7 +41,7 @@ public class DictTestImpl<K, V> implements Dict<K, V> {
 	}
 
 	@Override
-	public CompletableFuture<Optional<V>> find(K key) {
+	public CompletableFuture<Optional<String>> find(String key) {
 		return CompletableFuture.completedFuture(Optional.of(m.get(key)));
 	}
 

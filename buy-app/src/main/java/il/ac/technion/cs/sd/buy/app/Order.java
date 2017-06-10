@@ -1,10 +1,12 @@
 package il.ac.technion.cs.sd.buy.app;
 
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
 public class Order {
 	@Override
 	public String toString() {
-		return "Order [kind=" + status + ", product_id=" + product_id + ", amount=" + amount + ", user_id=" + user_id
-				+ "]";
+		return status + ":" + product_id + ":" + amount + ":" + user_id + ":" + price;
 	}
 
 	private String status;
@@ -12,6 +14,18 @@ public class Order {
 	private String amount;
 	private String user_id;
 	private String price;
+
+	public static Order decodeOrder(String decoded) {
+		String[] arr = decoded.split(":");
+		return new Order(arr[0], arr[1], arr[2], arr[3], arr[4]);
+	}
+
+	public static CompletableFuture<Optional<Order>> decodeOrder(CompletableFuture<Optional<String>> find) {
+		return find.thenApply(decoded -> {
+			String[] arr = decoded.get().split(":");
+			return Optional.of(new Order(arr[0], arr[1], arr[2], arr[3], arr[4]));
+		});
+	}
 
 	public String getPrice() {
 		return price;
@@ -21,11 +35,19 @@ public class Order {
 		this.price = price;
 	}
 
-	public Order(String kind, String product_id, String amount, String user_id) {
-		this.status = kind;
+	public Order(String status, String product_id, String amount, String user_id) {
+		this.status = status;
 		this.product_id = product_id;
 		this.amount = amount;
 		this.user_id = user_id;
+	}
+
+	public Order(String status, String product_id, String amount, String user_id, String price) {
+		this.status = status;
+		this.product_id = product_id;
+		this.amount = amount;
+		this.user_id = user_id;
+		this.price = price;
 	}
 
 	public String getStatus() {
