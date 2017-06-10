@@ -28,7 +28,7 @@ public class ExampleTest {
 	private static Injector setupAndGetInjector(String fileName) throws FileNotFoundException {
 		String fileContents = new Scanner(new File(ExampleTest.class.getResource(fileName).getFile()))
 				.useDelimiter("\\Z").next();
-		Injector injector = Guice.createInjector(new BuyProductModule(), new LineStorageModule());
+		Injector injector = Guice.createInjector(new BuyProductModule(), new TestLineStorageModule());
 		BuyProductInitializer bpi = injector.getInstance(BuyProductInitializer.class);
 		if (fileName.endsWith("xml"))
 			bpi.setupXml(fileContents);

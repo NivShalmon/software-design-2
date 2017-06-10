@@ -50,10 +50,22 @@ TestStorer(){
   
   @Override public CompletableFuture<String> read(int lineNumber) {
     String $ = lst.get(lineNumber);
+    try {
+		Thread.sleep($.length());
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     return CompletableFuture.completedFuture($);
   }
   
   @Override public CompletableFuture<Integer> numberOfLines() {
+	try {
+		Thread.sleep(lst.size());
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     return CompletableFuture.completedFuture(lst.size());
   }
 }
