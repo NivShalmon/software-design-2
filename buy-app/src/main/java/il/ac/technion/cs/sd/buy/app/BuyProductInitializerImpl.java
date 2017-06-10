@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,10 +30,11 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
 	private Map<String, Order> tmpOrderIdToOrder;
-	private Map<String, List<String>> tmpUserIdToOrderIds;
-	private Map<String, List<String>> tmpProductIdToOrderIds;
 	private Map<String, List<Integer>> tmpOrderIdToHistory;
 	private Map<String, String> tmpProductIdToPrice;
+
+	private Map<String, List<String>> tmpUserIdToOrderIds;
+	private Map<String, List<String>> tmpProductIdToOrderIds;
 
 	// actual structures
 
@@ -163,9 +165,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	private void addOrder(String order_id, String user_id, String product_id, String amount, String status) {
 		tmpOrderIdToOrder.put(order_id, new Order(status, product_id, amount, user_id));
-		if (tmpUserIdToOrderIds.get(user_id) == null)
-			tmpUserIdToOrderIds.put(user_id, new ArrayList<>());
-		tmpUserIdToOrderIds.get(user_id).add(order_id);
+
 		tmpOrderIdToHistory.put(order_id, new ArrayList<>());
 		tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
 	}
@@ -188,14 +188,33 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	private void initialStructures() {
 
-		System.out.println("ProductIdToPrice:");
-		System.out.println(tmpProductIdToPrice);
-		System.out.println("OrderIdToOrder:");
-		System.out.println(tmpOrderIdToOrder);
-		System.out.println("History:");
-		System.out.println(tmpOrderIdToHistory);
+		// clear all the old orders
+		Set<String> oids = tmpOrderIdToOrder.keySet();
+		for (String oid : oids) {
+			if (tmpProductIdToPrice.containsKey(tmpOrderIdToOrder.get(oid).getProduct_id())) {
+				tmpOrderIdToOrder.get(oid)
+						.setPrice(tmpProductIdToPrice.get(tmpOrderIdToOrder.get(oid).getProduct_id()));
+			} else {
+				tmpOrderIdToOrder.remove(oid);
+				tmpOrderIdToHistory.remove(oid);
+			}
 
-		System.out.println("___________");
+		}
+
+		oids = tmpOrderIdToOrder.keySet();
+		for (String oid : oids) {
+			String user = tmpOrderIdToOrder.get(oid).getUser_id();
+			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
+			if (!tmpUserIdToOrderIds.containsKey(user))
+				tmpUserIdToOrderIds.put(user, new ArrayList<>());
+
+			if (!tmpProductIdToOrderIds.containsKey(pid))
+				tmpProductIdToOrderIds.put(user, new ArrayList<>());
+
+			tmpUserIdToOrderIds.get(user).add(oid);
+			tmpProductIdToOrderIds.get(pid).add(oid);
+
+		}
 
 		orderIdToOrder.addAll(tmpOrderIdToOrder);
 		userIdToOrderIds.addAll(tmpUserIdToOrderIds);
