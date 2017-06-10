@@ -38,16 +38,15 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// actual structures
 
-	private Dict<String, Order> orderIdToOrder;
-	private Dict<String, List<String>> userIdToOrderIds;
-	private Dict<String, List<String>> productIdToOrderIds;
-	private Dict<String, List<Integer>> orderIdToHistory;
-	private DoubleKeyDict<String, String, Long> UserProductAmount;
+	private Dict orderIdToOrder;
+	private Dict userIdToOrderIds;
+	private Dict productIdToOrderIds;
+	private Dict orderIdToHistory;
+	private DoubleKeyDict UserProductAmount;
 
 	@Inject
-	public BuyProductInitializerImpl(Dict<String, Order> orderIdToOrder, Dict<String, List<String>> userIdToOrderIds,
-			Dict<String, List<String>> productIdToOrderIds, Dict<String, List<Integer>> orderIdToHistory,
-			DoubleKeyDict<String, String, Long> userProductAmount) {
+	public BuyProductInitializerImpl(Dict orderIdToOrder, Dict userIdToOrderIds, Dict productIdToOrderIds,
+			Dict orderIdToHistory, DoubleKeyDict userProductAmount) {
 		this();
 
 		this.orderIdToOrder = orderIdToOrder;
@@ -217,16 +216,31 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 		}
 
 		// Add to the actual structures
-		orderIdToOrder.addAll(tmpOrderIdToOrder);
-		userIdToOrderIds.addAll(tmpUserIdToOrderIds);
-		productIdToOrderIds.addAll(tmpProductIdToOrderIds);
-		orderIdToHistory.addAll(tmpOrderIdToHistory);
+		for (String oid : tmpOrderIdToOrder.keySet()) {
+			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString());
+		}
+		orderIdToOrder.store();
+
+		for (String user : tmpUserIdToOrderIds.keySet()) {
+			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString());
+		}
+		userIdToOrderIds.store();
+
+		for (String pid : tmpProductIdToOrderIds.keySet()) {
+			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString());
+		}
+		productIdToOrderIds.store();
+
+		for (String oid : tmpOrderIdToHistory.keySet()) {
+			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString());
+		}
+		orderIdToHistory.store();
 
 		for (String oid : oids) {
 			String user = tmpOrderIdToOrder.get(oid).getUser_id();
 			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
 			String amount = tmpOrderIdToOrder.get(oid).getAmount();
-			UserProductAmount.add(user, pid, Long.parseLong(amount));
+			UserProductAmount.add(user, pid, amount);
 		}
 
 		orderIdToOrder.store();
@@ -238,23 +252,23 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 	}
 
 	// Getters for testing the initializer only !
-	public Dict<String, Order> getOrderIdToOrder() {
+	public Dict getOrderIdToOrder() {
 		return orderIdToOrder;
 	}
 
-	public Dict<String, List<String>> getUserIdToOrderIds() {
+	public Dict getUserIdToOrderIds() {
 		return userIdToOrderIds;
 	}
 
-	public Dict<String, List<String>> getProductIdToOrderIds() {
+	public Dict getProductIdToOrderIds() {
 		return productIdToOrderIds;
 	}
 
-	public Dict<String, List<Integer>> getOrderIdToHistory() {
+	public Dict getOrderIdToHistory() {
 		return orderIdToHistory;
 	}
 
-	public DoubleKeyDict<String, String, Long> getUserProductAmount() {
+	public DoubleKeyDict getUserProductAmount() {
 		return UserProductAmount;
 	}
 
