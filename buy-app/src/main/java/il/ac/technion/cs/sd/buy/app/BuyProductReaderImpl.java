@@ -194,6 +194,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	private static CompletableFuture<Map<String, Long>> convertMap(CompletableFuture<Map<String, String>> x) {
 		return x.thenApply(m -> {
+			if (m == null || m.isEmpty())
+				return new HashMap<>();
 			Map<String, Long> ret = new HashMap<>();
 			for (String k : m.keySet()) {
 				ret.put(k, Long.parseLong(m.get(k)));

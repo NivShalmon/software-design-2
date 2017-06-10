@@ -87,7 +87,7 @@ public class Order {
 	}
 
 	public boolean isModified() {
-		return "modified".equals(this.status);
+		return "modified".equals(this.status) || isCancelled();
 	}
 
 }

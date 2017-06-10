@@ -3,6 +3,7 @@ package il.ac.technion.cs.sd.buy.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.OptionalInt;
 import java.util.Scanner;
 
@@ -48,6 +49,10 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getOrderIdsThatPurchased("iphone").get().size(), 0);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("android").get().getAsLong(), 0);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
+			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 1, 0.001);
+			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 1, 0.001);
+			assertEquals(reader.getAllItemsPurchased("1").get(), new HashMap<>());
+			assertEquals(reader.getItemsPurchasedByUsers("1").get(), new HashMap<>());
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -236,7 +236,8 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			String user = tmpOrderIdToOrder.get(oid).getUser_id();
 			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
 			String amount = tmpOrderIdToOrder.get(oid).getAmount();
-			UserProductAmount.add(user, pid, amount);
+			if (!tmpOrderIdToOrder.get(oid).isCancelled())
+				UserProductAmount.add(user, pid, amount);
 		}
 
 		orderIdToOrder.store();
