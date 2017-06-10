@@ -18,7 +18,7 @@ public class DoubleKeyDictTest {
 	
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test0");
 		testDict.add("a", "Dor", "Niv");
 		testDict.add("b", "Niv", "10203040");
 		testDict.add("b", "Dor", "1020304050");
@@ -29,7 +29,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test1() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test1");
 		testDict.add("12345", "Dor", "a1");
 		testDict.add("54321", "Niv", "a2");
 		//
@@ -40,7 +40,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test2() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test2");
 		for (int i = 0; i < 3339; i++) {
 			testDict.add(i + "", i + "", i + "");
 		}
@@ -52,7 +52,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test3() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test3");
 		testDict.add("b", "Niv", "c");
 		testDict.add("a", "Dor", "c");
 		testDict.store();
@@ -64,7 +64,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test4() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test4");
 		testDict.add("b", "Niv", "c");
 		testDict.add("a", "Dor", "c");
 		testDict.store();
@@ -76,7 +76,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test5() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test5");
 		testDict.add("b", "Niv", "c");
 		testDict.add("b", "Dor", "c");
 		testDict.add("c", "x", "y");
@@ -93,7 +93,7 @@ public class DoubleKeyDictTest {
 
 	@Test()
 	public void test6() throws InterruptedException, ExecutionException {
-		DoubleKeyDict testDict = f.create("test");
+		DoubleKeyDict testDict = f.create("test6");
 		testDict.add("b", "x", "c");
 		testDict.add("b", "x", "c");
 		testDict.add("c", "x", "y");

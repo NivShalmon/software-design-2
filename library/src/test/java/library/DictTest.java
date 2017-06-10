@@ -17,7 +17,7 @@ public class DictTest {
 
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {
-		Dict testDict = f.create("test");
+		Dict testDict = f.create("test0");
 		testDict.add("a", "Dor");
 		testDict.add("b", "Niv");
 		testDict.store();
@@ -27,7 +27,7 @@ public class DictTest {
 
 	@Test()
 	public void test1() throws Exception {
-		Dict testDict = f.create("test");
+		Dict testDict = f.create("test1");
 		testDict.add("a", "Dor");
 		testDict.store();
 		//
@@ -36,7 +36,7 @@ public class DictTest {
 
 	@Test()
 	public void test2() throws Exception {
-		Dict testDict = f.create("test");
+		Dict testDict = f.create("test2");
 		for (int i = 0; i < 3339; i++) {
 			testDict.add(i + "", i + "");
 		}
@@ -47,7 +47,7 @@ public class DictTest {
 
 	@Test()
 	public void test3() throws Exception {
-		Dict testDict = f.create("test");
+		Dict testDict = f.create("test3");
 		testDict.add("b", "Niv");
 		testDict.add("a", "Dor");
 		testDict.store();
