@@ -13,9 +13,10 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
 /**
- * The implementation of the Dict. Can be created using assisted injection. see
- * {@link TestLineStorageModule} for example on how to use assisted injection to
- * add the binding to a moudle.
+ * The provided implementation of {@link Dict}, using {@link FutureLineStorage}
+ * 
+ * @see {@link DictFactory} and {@link LibraryModule} for more info on how to
+ *      create an instance
  */
 public class DictImpl implements Dict {
 	private final CompletableFuture<FutureLineStorage> storer;
@@ -29,11 +30,13 @@ public class DictImpl implements Dict {
 	}
 
 	public CompletableFuture<Void> store() {
-		return (storingStatus = storeToStorage(pairs, storer, storer)).thenAccept(s->{});
+		return (storingStatus = storeToStorage(pairs, storer, storer)).thenAccept(s -> {
+		});
 	}
 
-	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store, CompletableFuture<?> current) {
-		for(String key : map.keySet().stream().sorted().collect(Collectors.toList())){
+	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store,
+			CompletableFuture<?> current) {
+		for (String key : map.keySet().stream().sorted().collect(Collectors.toList())) {
 			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(key)));
 			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(map.get(key))));
 		}
@@ -46,12 +49,13 @@ public class DictImpl implements Dict {
 	}
 
 	@Override
-	public void addAll(Map< String,  String> ps) {
+	public void addAll(Map<String, String> ps) {
 		pairs.putAll(ps);
 	}
 
 	@Override
 	public CompletableFuture<Optional<String>> find(String key) {
-		return storingStatus.thenCompose(v->BinarySearch.valueOf(storer,key, 0, storer.thenCompose(s -> s.numberOfLines())));
+		return storingStatus
+				.thenCompose(v -> BinarySearch.valueOf(storer, key, 0, storer.thenCompose(s -> s.numberOfLines())));
 	}
 }

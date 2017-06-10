@@ -12,6 +12,13 @@ import com.google.inject.assistedinject.Assisted;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
+/**
+ * The provided implementation of {@link DoubleKeyDict}, using
+ * {@link FutureLineStorage}
+ * 
+ * @see {@link DoubleKeyDictFactory} and {@link LibraryModule} for more info on
+ *      how to create an instance
+ */
 public class DoubleKeyDictImpl implements DoubleKeyDict {
 	private final Dict mainKeyDict;
 	private final Dict secondaryKeyDict;
@@ -50,7 +57,8 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 		IntegerWrapper currentLine = new IntegerWrapper();
 		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storingStatus);
 		storingStatus = storeDict(secondaryKeyDict, secondaryKeyMap, currentLine, storingStatus);
-		return storingStatus.thenAccept(s->{});
+		return storingStatus.thenAccept(s -> {
+		});
 	}
 
 	private CompletableFuture<?> storeDict(final Dict dict, final Map<String, Map<String, String>> m,

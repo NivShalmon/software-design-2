@@ -6,6 +6,11 @@ import java.util.function.Function;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
+/**
+ * A helper class of the Library, not meant for use by users
+ * inculded the implementation of the binary search used by
+ * the library
+ */
 class BinarySearch {
 	
 	/**
