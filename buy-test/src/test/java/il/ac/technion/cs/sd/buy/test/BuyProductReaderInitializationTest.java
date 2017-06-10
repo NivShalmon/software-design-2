@@ -40,8 +40,8 @@ public class BuyProductReaderInitializationTest {
 			assert (!reader.getNumberOfProductOrdered("165").get().isPresent());
 			assert (reader.getNumberOfProductOrdered("1").get().isPresent());
 			assertEquals(reader.getNumberOfProductOrdered("1").get().getAsInt(), -10);
-			//assertEquals(reader.getHistoryOfOrder("1").get().get().intValue(), -1);
-
+			assertEquals(reader.getHistoryOfOrder("1").get().get(2).intValue(), -1);
+			assertEquals(reader.getOrderIdsForUser("1").get().get(0), "1");
 
 		} catch (Exception e) {
 			e.printStackTrace();

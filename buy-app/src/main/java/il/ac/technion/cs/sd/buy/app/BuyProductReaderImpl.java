@@ -84,7 +84,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsForUser(String s0) {
-		return userIdToOrderIds.find(s0).thenApply(lst -> lst.isPresent() ? new ArrayList<String>()
+		return userIdToOrderIds.find(s0).thenApply(lst -> !lst.isPresent() ? new ArrayList<String>()
 				: decodeListStrings(lst.get()).stream().sorted().collect(Collectors.toList()));
 	}
 

@@ -220,22 +220,22 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		// Add to the actual structures
 		for (String oid : tmpOrderIdToOrder.keySet()) {
-			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString());
+			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+",""));
 		}
 		orderIdToOrder.store();
 
 		for (String user : tmpUserIdToOrderIds.keySet()) {
-			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString());
+			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+",""));
 		}
 		userIdToOrderIds.store();
 
 		for (String pid : tmpProductIdToOrderIds.keySet()) {
-			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString());
+			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+",""));
 		}
 		productIdToOrderIds.store();
 
 		for (String oid : tmpOrderIdToHistory.keySet()) {
-			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString());
+			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+",""));
 		}
 		orderIdToHistory.store();
 
