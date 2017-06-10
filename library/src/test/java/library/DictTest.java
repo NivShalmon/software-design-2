@@ -12,7 +12,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class DictTest {
-	static Injector injector = Guice.createInjector(new TestLineStorageModule(),new LibraryMoudle());
+	static Injector injector = Guice.createInjector(new TestLineStorageModule(),new LibraryModule());
 	static DictFactory f = injector.getInstance(DictFactory.class);
 
 	@Test()

@@ -13,7 +13,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class DoubleKeyDictTest {
-	static Injector injector = Guice.createInjector(new TestLineStorageModule(), new LibraryMoudle());
+	static Injector injector = Guice.createInjector(new TestLineStorageModule(), new LibraryModule());
 	static DoubleKeyDictFactory f = injector.getInstance(DoubleKeyDictFactory.class);
 	
 	@Test()
