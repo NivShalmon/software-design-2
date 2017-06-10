@@ -21,6 +21,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import library.Dict;
 import library.DoubleKeyDict;
@@ -30,12 +31,12 @@ import org.w3c.dom.Node;
 public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	// temporary structures
-	private Map<String, Order> tmpOrderIdToOrder;
-	private Map<String, List<Integer>> tmpOrderIdToHistory;
-	private Map<String, String> tmpProductIdToPrice;
+	private Map<String, Order> tmpOrderIdToOrder = new HashMap<>();
+	private Map<String, List<Integer>> tmpOrderIdToHistory = new HashMap<>();
+	private Map<String, String> tmpProductIdToPrice = new HashMap<>();
 
-	private Map<String, List<String>> tmpUserIdToOrderIds;
-	private Map<String, List<String>> tmpProductIdToOrderIds;
+	private Map<String, List<String>> tmpUserIdToOrderIds = new HashMap<>();
+	private Map<String, List<String>> tmpProductIdToOrderIds = new HashMap<>();
 
 	// actual structures
 
@@ -46,24 +47,16 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 	private DoubleKeyDict UserProductAmount;
 
 	@Inject
-	public BuyProductInitializerImpl(Dict orderIdToOrder, Dict userIdToOrderIds, Dict productIdToOrderIds,
-			Dict orderIdToHistory, DoubleKeyDict userProductAmount) {
-		this();
-
+	public BuyProductInitializerImpl(@Named("orderIdToOrder") Dict orderIdToOrder, //
+			@Named("userIdToOrderIds") Dict userIdToOrderIds, //
+			@Named("productIdToOrderIds") Dict productIdToOrderIds, //
+			@Named("orderIdToHistory") Dict orderIdToHistory, //
+			@Named("userProductAmount") DoubleKeyDict userProductAmount) {
 		this.orderIdToOrder = orderIdToOrder;
 		this.userIdToOrderIds = userIdToOrderIds;
 		this.productIdToOrderIds = productIdToOrderIds;
 		this.orderIdToHistory = orderIdToHistory;
 		UserProductAmount = userProductAmount;
-
-	}
-
-	public BuyProductInitializerImpl() {
-		tmpOrderIdToOrder = new HashMap<>();
-		tmpUserIdToOrderIds = new HashMap<>();
-		tmpProductIdToOrderIds = new HashMap<>();
-		tmpOrderIdToHistory = new HashMap<>();
-		tmpProductIdToPrice = new HashMap<>();
 	}
 
 	@Override
@@ -220,22 +213,22 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		// Add to the actual structures
 		for (String oid : tmpOrderIdToOrder.keySet()) {
-			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+",""));
+			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+", ""));
 		}
 		orderIdToOrder.store();
 
 		for (String user : tmpUserIdToOrderIds.keySet()) {
-			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+",""));
+			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+", ""));
 		}
 		userIdToOrderIds.store();
 
 		for (String pid : tmpProductIdToOrderIds.keySet()) {
-			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+",""));
+			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+", ""));
 		}
 		productIdToOrderIds.store();
 
 		for (String oid : tmpOrderIdToHistory.keySet()) {
-			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+",""));
+			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+", ""));
 		}
 		orderIdToHistory.store();
 

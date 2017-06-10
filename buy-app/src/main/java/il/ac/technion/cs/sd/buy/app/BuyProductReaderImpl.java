@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 import library.Dict;
 import library.DoubleKeyDict;
@@ -26,9 +27,11 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	private DoubleKeyDict userProductAmount;
 
 	@Inject
-	public BuyProductReaderImpl(Dict orderIdToOrder, Dict userIdToOrderIds, Dict productIdToOrderIds,
-			Dict orderIdToHistory, DoubleKeyDict userProductAmount) {
-		super();
+	public BuyProductReaderImpl(@Named("orderIdToOrder") Dict orderIdToOrder, //
+			@Named("userIdToOrderIds") Dict userIdToOrderIds, //
+			@Named("productIdToOrderIds") Dict productIdToOrderIds, //
+			@Named("orderIdToHistory") Dict orderIdToHistory, //
+			@Named("userProductAmount") DoubleKeyDict userProductAmount) {
 		this.orderIdToOrder = orderIdToOrder;
 		this.userIdToOrderIds = userIdToOrderIds;
 		this.productIdToOrderIds = productIdToOrderIds;
