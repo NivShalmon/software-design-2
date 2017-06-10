@@ -2,6 +2,7 @@ package il.ac.technion.cs.sd.buy.app;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -123,7 +124,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<List<String>> getOrderIdsThatPurchased(String s0) {
 		return productIdToOrderIds.find(s0).thenApply(orderIds -> !orderIds.isPresent() ? new ArrayList<String>()
-				: orderIds.get().stream().sorted().collect(Collectors.toList()));
+				: decodeListStrings(orderIds.get()).stream().sorted().collect(Collectors.toList()));
 	}
 
 	// items that were purchased by a given product id
@@ -179,20 +180,31 @@ public class BuyProductReaderImpl implements BuyProductReader {
 
 	@Override
 	public CompletableFuture<Map<String, Long>> getAllItemsPurchased(String s0) {
-		return UserProductAmount.findByMainKey(s0);
+		return convertMap(userProductAmount.findByMainKey(s0));
 	}
 
 	@Override
 	public CompletableFuture<Map<String, Long>> getItemsPurchasedByUsers(String s0) {
-		return UserProductAmount.findBySecondaryKey(s0);
+		return convertMap(userProductAmount.findBySecondaryKey(s0));
+	}
+
+	private static CompletableFuture<Map<String, Long>> convertMap(CompletableFuture<Map<String, String>> x) {
+		return x.thenApply(m -> {
+			Map<String, Long> ret = new HashMap<>();
+			for (String k : m.keySet()) {
+				ret.put(k, Long.parseLong(m.get(k)));
+			}
+			return ret;
+		});
 	}
 
 	private static List<String> decodeListStrings(String encoded) {
 		return Arrays.asList((encoded.substring(1).substring(0, encoded.substring(1).length() - 1).split(",")));
 	}
-	
+
 	private static Optional<List<String>> decodeListStringsOptional(Optional<String> encoded) {
-		return Optional.of(Arrays.asList((encoded.get().substring(1).substring(0, encoded.get().substring(1).length() - 1).split(","))));
+		return Optional.of(Arrays
+				.asList((encoded.get().substring(1).substring(0, encoded.get().substring(1).length() - 1).split(","))));
 	}
 
 	private static List<Integer> decodeListIntegers(String encoded) {

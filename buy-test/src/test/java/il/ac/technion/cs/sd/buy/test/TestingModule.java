@@ -11,7 +11,6 @@ public class TestingModule extends AbstractModule {
 	protected void configure() {
 		bind(Dict.class).to(DictTestImpl.class);
 		bind(DoubleKeyDict.class).to(DoubleDictTestImpl.class);
-
 	}
 
 }

@@ -8,6 +8,8 @@ import il.ac.technion.cs.sd.buy.app.BuyProductReader;
 import il.ac.technion.cs.sd.buy.app.BuyProductReaderImpl;
 import library.Dict;
 import library.DictImpl;
+import library.DoubleKeyDict;
+import library.DoubleKeyDictImpl;
 
 // This module is in the testing project, so that it could easily bind all dependencies from all levels.
 public class BuyProductModule extends AbstractModule {
@@ -16,6 +18,6 @@ public class BuyProductModule extends AbstractModule {
 		bind(BuyProductInitializer.class).to(BuyProductInitializerImpl.class);
 		bind(BuyProductReader.class).to(BuyProductReaderImpl.class);
 		bind(Dict.class).to(DictImpl.class);
-		//TODO: finish
+		bind(DoubleKeyDict.class).to(DoubleKeyDictImpl.class);
 	}
 }
