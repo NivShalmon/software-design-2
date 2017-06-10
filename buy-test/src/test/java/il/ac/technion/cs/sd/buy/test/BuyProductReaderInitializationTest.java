@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Scanner;
 
@@ -98,19 +99,33 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getUsersThatPurchased("linux").get().size(), 1);
 			assertEquals(reader.getUsersThatPurchased("windows").get().size(), 1);
 
-			assertEquals(reader.getOrderIdsThatPurchased("mac").get().get(0), 1+"");
-			assertEquals(reader.getOrderIdsThatPurchased("windows").get().get(0), 2+"");
-			assertEquals(reader.getOrderIdsThatPurchased("linux").get().get(0), 3+"");
+			assertEquals(reader.getOrderIdsThatPurchased("mac").get().get(0), 1 + "");
+			assertEquals(reader.getOrderIdsThatPurchased("windows").get().get(0), 2 + "");
+			assertEquals(reader.getOrderIdsThatPurchased("linux").get().get(0), 3 + "");
 
 			assertEquals(reader.getTotalNumberOfItemsPurchased("mac").get().getAsLong(), 2);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("linux").get().getAsLong(), 100);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("windows").get().getAsLong(), 5);
-			
 			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
-			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 1, 0.001);
+
+			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getAllItemsPurchased("1").get(), new HashMap<>());
-			assertEquals(reader.getItemsPurchasedByUsers("1").get(), new HashMap<>());
+
+			assertEquals(reader.getCancelRatioForUser("2").get().getAsDouble(), 0, 0.001);
+			assertEquals(reader.getModifyRatioForUser("2").get().getAsDouble(), 0, 0.001);
+
+			assertEquals(reader.getCancelRatioForUser("3").get().getAsDouble(), 0, 0.001);
+			assertEquals(reader.getModifyRatioForUser("3").get().getAsDouble(), 0, 0.001);
+
+			Map<String, Long> m = new HashMap<>();
+			m.put("linux", 100L);
+			m.put("windows", 5L);
+			m.put("mac", 2L);
+
+			assertEquals(reader.getAllItemsPurchased("1").get(), m);
+			// TODO: check it !
+			// assertEquals(reader.getItemsPurchasedByUsers("2").get(), new
+			// HashMap<>());
 
 		} catch (Exception e) {
 			e.printStackTrace();

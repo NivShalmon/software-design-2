@@ -135,7 +135,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<OptionalLong> getTotalNumberOfItemsPurchased(String s0) {
 
-		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+		return productIdToOrderIds.find(s0).thenCompose(orderIds -> {
 			CompletableFuture<List<Order>> orders = getOrders(decodeListStringsOptional(orderIds));
 			return orders
 					.thenApply(ordersLst -> OptionalLong.of(ordersLst.stream().filter(order -> !order.isCancelled())
