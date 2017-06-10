@@ -9,7 +9,7 @@ public class TestLineStorageModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind(FutureLineStorageFactory.class).to(TestStorerFactory.class);
+		bind(FutureLineStorageFactory.class).toInstance(new TestStorerFactory());
 		bind(FutureLineStorage.class).to(TestStorer.class);
 	}
 
