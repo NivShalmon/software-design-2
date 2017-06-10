@@ -23,9 +23,12 @@ public interface DoubleKeyDict {
 	/**
 	 * Performs the persistent write using {@link FutureLineStorage}, and prevents
 	 * further writes to the {@link DoubleKeyDict}
-	 * @throws Exception if for some reason the write operation failed
+	 * @return a {@link CompletableFuture} that shows whether the store
+	 * was completed.
+	 * User must make sure to wait on this before calling find() from
+	 * a different instance of the same Dict (i.e same name)
 	 */
-	public void store();
+	public CompletableFuture<Void> store();
 
 	/**
 	 * A search by the main key

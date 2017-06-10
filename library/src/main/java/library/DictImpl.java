@@ -25,11 +25,11 @@ public class DictImpl implements Dict {
 	@Inject
 	DictImpl(FutureLineStorageFactory factory, //
 			@Assisted String name) {
-		this.storer = factory.open(name);
+		storingStatus = storer = factory.open(name);
 	}
 
-	public void store() {
-		storingStatus = storeToStorage(pairs, storer, storer);
+	public CompletableFuture<Void> store() {
+		return (storingStatus = storeToStorage(pairs, storer, storer)).thenAccept(s->{});
 	}
 
 	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store, CompletableFuture<?> current) {
@@ -52,6 +52,6 @@ public class DictImpl implements Dict {
 
 	@Override
 	public CompletableFuture<Optional<String>> find(String key) {
-		return storingStatus.thenCompose(v -> BinarySearch.valueOf(storer,key, 0, storer.thenCompose(s -> s.numberOfLines())));
+		return storingStatus.thenCompose(v->BinarySearch.valueOf(storer,key, 0, storer.thenCompose(s -> s.numberOfLines())));
 	}
 }

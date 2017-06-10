@@ -35,7 +35,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	@Inject
 	public DoubleKeyDictImpl(DictFactory dictFactory, FutureLineStorageFactory lineStorageFactory,
 			@Assisted String name) {
-		storer = lineStorageFactory.open(name + ".valuesMap");
+		storingStatus = storer = lineStorageFactory.open(name + ".valuesMap");
 		mainKeyDict = dictFactory.create(name + ".mainKeyMap");
 		secondaryKeyDict = dictFactory.create(name + ".secondaryKeyMap");
 	}
@@ -46,14 +46,11 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 		addToMap(secondaryKeyMap, secondaryKey, mainKey, value);
 	}
 
-	/**
-	 * Performs the persistent write using the {@link LineStorage}, and prevents
-	 * further writes to the {@link DoubleKeyDict}
-	 */
-	public void store() {
+	public CompletableFuture<Void> store() {
 		IntegerWrapper currentLine = new IntegerWrapper();
-		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storer);
+		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storingStatus);
 		storingStatus = storeDict(secondaryKeyDict, secondaryKeyMap, currentLine, storingStatus);
+		return storingStatus.thenAccept(s->{});
 	}
 
 	private CompletableFuture<?> storeDict(final Dict dict, final Map<String, Map<String, String>> m,

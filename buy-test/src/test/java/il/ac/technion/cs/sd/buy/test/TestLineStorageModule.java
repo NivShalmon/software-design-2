@@ -1,10 +1,9 @@
-package library;
+package il.ac.technion.cs.sd.buy.test;
 
 import com.google.inject.AbstractModule;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
-import library.TestStorerFactory;
 
 public class TestLineStorageModule extends AbstractModule {
 

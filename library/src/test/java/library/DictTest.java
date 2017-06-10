@@ -12,8 +12,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class DictTest {
-	static Injector injector = Guice.createInjector(new TestLineStorageModule());
-	static DictImplFactory f = injector.getInstance(DictImplFactory.class);
+	static Injector injector = Guice.createInjector(new TestLineStorageModule(),new LibraryMoudle());
+	static DictFactory f = injector.getInstance(DictFactory.class);
 
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {

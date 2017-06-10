@@ -20,8 +20,12 @@ public interface Dict {
 	 * Performs the persistent write using the {@link LineStorage}, and prevents further writes
 	 * to the {@link Dict}
 	 * Don't call this more than once, since that might corrupt the Dict. 
+	 * @return a {@link CompletableFuture} that shows whether the store
+	 * was completed.
+	 * User must make sure to wait on this before calling find() from
+	 * a different instance of the same Dict (i.e same name)
 	 */
-	public void store();
+	public CompletableFuture<Void> store();
 
 	/**
 	 * adds a pair to the Dict. Should only be called before a store operation

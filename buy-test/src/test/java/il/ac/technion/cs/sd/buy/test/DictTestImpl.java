@@ -19,9 +19,9 @@ public class DictTestImpl implements Dict {
 	}
 
 	@Override
-	public void store() {
+	public CompletableFuture<Void> store() {
 		this.isStored = true;
-
+		return CompletableFuture.completedFuture(1).thenAccept(s -> {});
 	}
 
 	@Override

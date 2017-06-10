@@ -13,8 +13,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 public class DoubleKeyDictTest {
-	static Injector injector = Guice.createInjector(new TestLineStorageModule());
-	static DoubleKeyDictImplFactory f = injector.getInstance(DoubleKeyDictImplFactory.class);
+	static Injector injector = Guice.createInjector(new TestLineStorageModule(), new LibraryMoudle());
+	static DoubleKeyDictFactory f = injector.getInstance(DoubleKeyDictFactory.class);
 	
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {
