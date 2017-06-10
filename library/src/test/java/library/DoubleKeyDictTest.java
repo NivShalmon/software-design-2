@@ -4,7 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -38,78 +41,75 @@ public class DoubleKeyDictTest {
 		//
 		assertTrue(testDict.findByMainKey("asdf").get().isEmpty());
 	}
-//
-//	@Test()
-//	public void test2() throws InterruptedException {
-//		List<Triple> input = new ArrayList<Triple>();
-//		for (int i = 0; i < 3339; i++) {
-//			input.add(new Triple(i + "", i + "", i + ""));
-//		}
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		//
-//		testDict.addAndStore(input);
-//		//
-//		assertEquals("1456", testDict.findByKeys("1456", "1456").get());
-//	}
-//
-//	@Test()
-//	public void test3() throws InterruptedException {
-//		List<Triple> input = new ArrayList<Triple>();
-//		input.add(new Triple("b", "Niv", "c"));
-//		input.add(new Triple("a", "Dor", "c"));
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		testDict.addAndStore(input);
-//		//
-//		assertEquals(new Pair("Niv", "c"), testDict.findByMainKey("b").get(0));
-//	}
-//
-//	@Test()
-//	public void test4() throws InterruptedException {
-//		List<Triple> input = new ArrayList<Triple>();
-//		input.add(new Triple("b", "Niv", "c"));
-//		input.add(new Triple("a", "Dor", "c"));
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		testDict.addAndStore(input);
-//		//
-//		assertEquals(new Pair("a", "c"), testDict.findBySecondaryKey("Dor").get(0));
-//	}
-//
-//	@Test()
-//	public void test5() throws InterruptedException {
-//		List<Triple> input = new ArrayList<Triple>();
-//		input.add(new Triple("b", "Niv", "c"));
-//		input.add(new Triple("b", "Dor", "c"));
-//		input.add(new Triple("c", "x", "y"));
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		testDict.addAndStore(input);
-//		//
-//		List<Pair> lst = new ArrayList<>();
-//		lst.add(new Pair("Dor", "c"));
-//		lst.add(new Pair("Niv", "c"));
-//		lst.stream().sorted().collect(Collectors.toList());
-//		List<Pair> res = testDict.findByMainKey("b").stream().sorted().collect(Collectors.toList());
-//		//
-//		for (int i = 0; i < res.size(); i++)
-//			assertEquals(lst.get(i), res.get(i));
-//	}
-//
-//	@Test()
-//	public void test6() throws InterruptedException {
-//		List<Triple> input = new ArrayList<Triple>();
-//		input.add(new Triple("b", "x", "c"));
-//		input.add(new Triple("b", "x", "c"));
-//		input.add(new Triple("c", "x", "y"));
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		testDict.addAndStore(input);
-//		//
-//		List<Pair> lst = new ArrayList<>();
-//		lst.add(new Pair("b", "c"));
-//		lst.add(new Pair("b", "c"));
-//		lst.add(new Pair("c", "y"));
-//		lst.stream().sorted().collect(Collectors.toList());
-//		List<Pair> res = testDict.findBySecondaryKey("x").stream().sorted().collect(Collectors.toList());
-//		//
-//		for (int i = 0; i < res.size(); i++)
-//			assertEquals(lst.get(i), res.get(i));
-//	}
+
+	@Test()
+	public void test2() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		for (int i = 0; i < 3339; i++) {
+			testDict.add(i + "", i + "", i + "");
+		}
+		//
+		testDict.store();
+		//
+		assertEquals("1456", testDict.findByKeys("1456", "1456").get().get());
+	}
+
+	@Test()
+	public void test3() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		testDict.add("b", "Niv", "c");
+		testDict.add("a", "Dor", "c");
+		testDict.store();
+		//
+		Map<String,String> res =  testDict.findByMainKey("b").get();
+		assertEquals(1, res.size());
+		assertEquals("c",res.get("Niv"));
+	}
+
+	@Test()
+	public void test4() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		testDict.add("b", "Niv", "c");
+		testDict.add("a", "Dor", "c");
+		testDict.store();
+		//
+		Map<String,String> res =  testDict.findBySecondaryKey("Dor").get();
+		assertEquals(1, res.size());
+		assertEquals("c",res.get("a"));
+	}
+
+	@Test()
+	public void test5() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		testDict.add("b", "Niv", "c");
+		testDict.add("b", "Dor", "c");
+		testDict.add("c", "x", "y");
+		testDict.store();
+		//
+		Map<String,String> expected = new HashMap<>();
+		expected.put("Dor", "c");
+		expected.put("Niv", "c");
+		Map<String,String> res = testDict.findByMainKey("b").get();
+		//
+		for (String k : expected.keySet())
+			assertEquals(expected.get(k), res.get(k));
+	}
+
+	@Test()
+	public void test6() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		testDict.add("b", "x", "c");
+		testDict.add("b", "x", "c");
+		testDict.add("c", "x", "y");
+		testDict.store();
+		//
+		Map<String,String> expected = new HashMap<>();
+		expected.put("b", "c");
+		expected.put("b", "c");
+		expected.put("c", "y");
+		Map<String,String>  res = testDict.findBySecondaryKey("x").get();
+		//
+		for (String k : expected.keySet())
+			assertEquals(expected.get(k), res.get(k));
+	}
 }
