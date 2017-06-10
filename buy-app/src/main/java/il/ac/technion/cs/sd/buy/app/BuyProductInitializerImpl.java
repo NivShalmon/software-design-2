@@ -216,17 +216,24 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 		}
 
+		// Add to the actual structures
 		orderIdToOrder.addAll(tmpOrderIdToOrder);
 		userIdToOrderIds.addAll(tmpUserIdToOrderIds);
 		productIdToOrderIds.addAll(tmpProductIdToOrderIds);
 		orderIdToHistory.addAll(tmpOrderIdToHistory);
 
-		// TODO : dor UserProductAmount.;
+		for (String oid : oids) {
+			String user = tmpOrderIdToOrder.get(oid).getUser_id();
+			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
+			String amount = tmpOrderIdToOrder.get(oid).getAmount();
+			UserProductAmount.add(user, pid, Long.parseLong(amount));
+		}
 
 		orderIdToOrder.store();
 		userIdToOrderIds.store();
 		productIdToOrderIds.store();
 		orderIdToHistory.store();
+		UserProductAmount.store();
 
 	}
 
