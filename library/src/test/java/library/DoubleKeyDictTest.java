@@ -28,17 +28,16 @@ public class DoubleKeyDictTest {
 		assertEquals(2, testDict.findByMainKey("b").get().size());
 	}
 
-//	@Test()
-//	public void test1() throws InterruptedException {
-//		List<Triple> input = new ArrayList<>();
-//		input.add(new Triple("12345", "Dor", "a1"));
-//		input.add(new Triple("54321", "Niv", "a2"));
-//		DoubleKeyDict testDict = injector.getInstance(DoubleKeyDict.class);
-//		//
-//		testDict.addAndStore(input);
-//		//
-//		assertTrue(testDict.findByMainKey("asdf").isEmpty());
-//	}
+	@Test()
+	public void test1() throws InterruptedException, ExecutionException {
+		DoubleKeyDict testDict = f.create("test");
+		testDict.add("12345", "Dor", "a1");
+		testDict.add("54321", "Niv", "a2");
+		//
+		testDict.store();
+		//
+		assertTrue(testDict.findByMainKey("asdf").get().isEmpty());
+	}
 //
 //	@Test()
 //	public void test2() throws InterruptedException {

@@ -29,18 +29,22 @@ class BinarySearch {
 	 * key doesn't exist
 	 */
 	static CompletableFuture<Optional<String>> valueOf(CompletableFuture<FutureLineStorage> storer, String key, int low, int high) {
+		return of(storer,key,low/2,high/2-1);
+	}
+	
+	private static CompletableFuture<Optional<String>> of(CompletableFuture<FutureLineStorage> storer, String key, int low, int high) {
 		if (high < low)
 			return CompletableFuture.completedFuture(Optional.empty());
 		final int mid = (low + high) / 2;
-		return storer.thenCompose(s->s.read(mid)).thenCompose(new Function<String, CompletableFuture<Optional<String>>>() {
+		return storer.thenCompose(s->s.read(2 * mid)).thenCompose(new Function<String, CompletableFuture<Optional<String>>>() {
 			@Override
 			public CompletableFuture<Optional<String>> apply(String current) {
 				int comparison = current.compareTo(key);
 				if (comparison == 0)
-					return storer.thenCompose(s->s.read(mid + 1)).thenApply(s -> Optional.of(s));
+					return storer.thenCompose(s->s.read(2 * mid + 1)).thenApply(s -> Optional.of(s));
 				if (comparison < 0)
-					return valueOf(storer,key,mid+2,high);
-				return valueOf(storer,key,low,mid-2);
+					return of(storer,key,mid+1,high);
+				return of(storer,key,low,mid-1);
 			}
 		});
 	}
