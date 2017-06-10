@@ -14,7 +14,7 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
  * stops you from calling store twice. However, that would corrupt the Dict, so don't
  * do that.
  */
-public interface Dict<K,V> {
+public interface Dict {
 
 	/**
 	 * Performs the persistent write using the {@link LineStorage}, and prevents further writes
@@ -27,18 +27,18 @@ public interface Dict<K,V> {
 	 * adds a pair to the Dict. Should only be called before a store operation
 	 * Does not save the data persistently.
 	 */
-	public void add(K key,V value);
+	public void add(String key,String value);
 	
 	/**
 	 * adds pairs to the Dict. Should only be called before a store operation
 	 * Does not save the data persistently.
 	 */
-	public void addAll(Map<K,V> m);
+	public void addAll(Map<String,String> m);
 
 	/**
 	 * @param key
 	 *            the key to be searched in the dictionary
 	 * @return the value that matches key or {@link Optional.empty} otherwise.
 	 */
-	public CompletableFuture<Optional<V>> find(K key);
+	public CompletableFuture<Optional<String>> find(String key);
 }
