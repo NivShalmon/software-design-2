@@ -13,118 +13,102 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 
 public class DoubleKeyDictImpl implements DoubleKeyDict {
-	private final Map<String, Map<String, String>> mainKeyMap = new HashMap<>();
-	private final Map<String, Map<String, String>> secondaryKeyMap = new HashMap<>();
 	private final Dict mainKeyDict;
 	private final Dict secondaryKeyDict;
-	private final CompletableFuture<FutureLineStorage> values;
+	private final CompletableFuture<FutureLineStorage> storer;
+	private final Map<String,Map<String,String>> mainKeyMap = new HashMap<>();
+	private final Map<String,Map<String,String>> secondaryKeyMap = new HashMap<>();
+
+	private class IntegerWrapper {
+		public int val;
+
+		public IntegerWrapper() {
+			this.val = 0;
+		}
+
+		public String toString() {
+			return val + "";
+		}
+	}
 
 	@Inject
-	public DoubleKeyDictImpl(DictImplFactory dictFactory, FutureLineStorageFactory lineStorageFactory, //
+	public DoubleKeyDictImpl(DictImplFactory dictFactory, FutureLineStorageFactory lineStorageFactory,
 			@Assisted String name) {
-		this.mainKeyDict = dictFactory.create(name + ".mainKey");
-		this.secondaryKeyDict = dictFactory.create(name + ".secondaryKey");
-		this.values = lineStorageFactory.open(name + ".values");
+		storer = lineStorageFactory.open(name + ".valuesMap");
+		mainKeyDict = dictFactory.create(name + ".mainKeyMap");
+		secondaryKeyDict = dictFactory.create(name + ".secondaryKeyMap");
 	}
 
 	@Override
 	public void add(String mainKey, String secondaryKey, String value) {
-		addToMap(mainKey, secondaryKey, value, mainKeyMap);
-		addToMap(secondaryKey, mainKey, value, secondaryKeyMap);
+		addToMap(mainKeyMap, mainKey, secondaryKey,value);
+		addToMap(secondaryKeyMap, secondaryKey, mainKey,value);
 	}
 
-	private <A, B, C> void addToMap(A key1, B key2, C value, Map<A, Map<B, C>> map) {
-		if (!map.containsKey(key1))
-			map.put(key1, new HashMap<>());
-		map.get(key1).put(key2, value);
-	}
-
-	@Override
+	/**
+	 * Performs the persistent write using the {@link LineStorage}, and prevents
+	 * further writes to the {@link DoubleKeyDict}
+	 */
 	public void store() {
-		int startingLine = 0;
-		for (String key : mainKeyMap.keySet()) {
-			final Map<String, String> current = mainKeyMap.get(key);
-			int endingLine = startingLine + current.size() * 2;
-			mainKeyDict.add(key, startingLine + "" + endingLine);
-			startingLine = endingLine;
-			current.keySet().stream().sorted().forEachOrdered(k -> {
-				values.thenAccept(s -> s.appendLine(k));
-				values.thenAccept(s -> s.appendLine(current.get(k)));
+		IntegerWrapper currentLine = new IntegerWrapper();
+		storeDict(mainKeyDict, mainKeyMap, currentLine);
+		storeDict(secondaryKeyDict, secondaryKeyMap, currentLine);
+	}
+
+	private void storeDict(final Dict dict, final Map<String, Map<String,String>> m, IntegerWrapper currentLine) {
+		m.keySet().stream().sorted().forEachOrdered(key -> {
+			int startingLine = currentLine.val;
+			Map<String,String> current = m.get(key);
+			current.keySet().stream().sorted().forEachOrdered(key2 -> {
+				storer.thenApply(s->s.appendLine(key2));
+				storer.thenApply(s->s.appendLine(current.get(key2)));
+				currentLine.val += 2;
 			});
-		}
-		for (String key : secondaryKeyMap.keySet()) {
-			final Map<String, String> current = secondaryKeyMap.get(key);
-			int endingLine = startingLine + current.size() * 2;
-			secondaryKeyDict.add(key, startingLine + "," + endingLine);
-			startingLine = endingLine;
-			current.keySet().stream().sorted().forEachOrdered(k -> {
-				values.thenAccept(s -> s.appendLine(k));
-				values.thenAccept(s -> s.appendLine(current.get(k)));
-			});
-		}
+			dict.add(key, startingLine + "," + currentLine);
+		});
+		dict.store();
+	}
+
+	private void addToMap(final Map<String, Map<String,String>> m, String key1, String key2,String value) {
+		if (!m.containsKey(key1))
+			m.put(key1, new HashMap<>());
+		m.get(key1).put(key2, value);
 	}
 
 	@Override
 	public CompletableFuture<Map<String, String>> findByMainKey(String key) {
-		return mainKeyDict.find(key).thenApply(o -> o.map(s -> {
-			String[] lines = s.split(",");
-			int start, end;
-			try {
-				start = Integer.parseInt(lines[0]);
-				end = Integer.parseInt(lines[1]);
-			} catch (NumberFormatException e) {
-				return new HashMap<String, String>();
-			}
-			Map<String, String> m = new HashMap<>();
-			for (int i = start; i < end; ++i) {
-				final int line = i;
-				CompletableFuture<String> sKey = values.thenCompose(ls -> ls.read(line));
-				CompletableFuture<String> value = values.thenCompose(ls -> ls.read(line));
-				try {
-					m.put(sKey.get(), value.get());
-				} catch (InterruptedException | ExecutionException e) {
-					return new HashMap<String, String>();
-				}
-			}
-			return m;
-		}).orElse(new HashMap<String, String>()));
+		return findByKey(mainKeyDict,key);
 	}
 
 	@Override
-	public CompletableFuture<Optional<String>> findByKeys(String mainKey, String secondaryKey) {
-		return mainKeyDict.find(mainKey).thenCompose(o -> o.map(s -> {
-			String[] lines = s.split(",");
-			int start, end;
-			start = Integer.parseInt(lines[0]);
-			end = Integer.parseInt(lines[1]);
-			return BinarySearch.valueOf(values, secondaryKey, start, end);
-		}).orElse(CompletableFuture.completedFuture(Optional.empty())));
+	public CompletableFuture<Optional<String>> findByKeys(String key1, String key2) {
+		return mainKeyDict.find(key1).thenCompose(o -> {
+			if (!o.isPresent())
+				return CompletableFuture.completedFuture(Optional.empty());
+			String[] lines = o.get().split(",");
+			return BinarySearch.valueOf(storer, key2, Integer.parseInt(lines[0]), Integer.parseInt(lines[1]));
+		});
 	}
 
 	@Override
 	public CompletableFuture<Map<String, String>> findBySecondaryKey(String key) {
-		return secondaryKeyDict.find(key).thenApply(o -> o.map(s -> {
-			String[] lines = s.split(",");
-			int start, end;
-			try {
-				start = Integer.parseInt(lines[0]);
-				end = Integer.parseInt(lines[1]);
-			} catch (NumberFormatException e) {
-				return new HashMap<String, String>();
-			}
-			Map<String, String> m = new HashMap<>();
-			for (int i = start; i < end; ++i) {
-				final int line = i;
-				CompletableFuture<String> sKey = values.thenCompose(ls -> ls.read(line));
-				CompletableFuture<String> value = values.thenCompose(ls -> ls.read(line));
-				try {
-					m.put(sKey.get(), value.get());
-				} catch (InterruptedException | ExecutionException e) {
-					return new HashMap<String, String>();
-				}
-			}
-			return m;
-		}).orElse(new HashMap<String, String>()));
+		return findByKey(secondaryKeyDict, key);
 	}
 
+	private CompletableFuture<Map<String, String>> findByKey(Dict d, String key) {
+		return d.find(key).thenApply(o -> o.map(str ->{
+			Map<String,String> $ = new HashMap<>();
+			String[] lines = o.get().split(",");
+			int end = Integer.parseInt(lines[1]);
+			for (int i = Integer.parseInt(lines[0]); i < end; i += 2){
+				final int line = i;
+				try {
+					$.put(storer.thenCompose(s->s.read(line)).get(), storer.thenCompose(s->s.read(line+1)).get());
+				} catch (InterruptedException | ExecutionException e) {
+					return new HashMap<String,String>();
+				}
+			}
+			return $;
+		}).orElse(new HashMap<String,String>()));
+	}
 }

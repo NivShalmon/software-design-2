@@ -3,6 +3,7 @@ package library;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 
@@ -23,6 +24,7 @@ public interface DoubleKeyDict {
 	/**
 	 * Performs the persistent write using {@link FutureLineStorage}, and prevents
 	 * further writes to the {@link DoubleKeyDict}
+	 * @throws Exception if for some reason the write operation failed
 	 */
 	public void store();
 
