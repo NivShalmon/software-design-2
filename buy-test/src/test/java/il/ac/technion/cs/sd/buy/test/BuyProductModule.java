@@ -14,6 +14,7 @@ import library.DictImpl;
 import library.DictFactory;
 import library.DoubleKeyDict;
 import library.DoubleKeyDictImpl;
+import library.LibraryMoudle;
 import library.DoubleKeyDictFactory;
 
 // This module is in the testing project, so that it could easily bind all dependencies from all levels.
@@ -22,9 +23,7 @@ public class BuyProductModule extends AbstractModule {
 	protected void configure() {
 		bind(BuyProductInitializer.class).to(BuyProductInitializerImpl.class);
 		bind(BuyProductReader.class).to(BuyProductReaderImpl.class);
-		install(new FactoryModuleBuilder().implement(Dict.class, DictImpl.class)//
-				.build(DictFactory.class));
-		install(new FactoryModuleBuilder().implement(DoubleKeyDict.class, DoubleKeyDictImpl.class).build(DoubleKeyDictFactory.class));
+		install(new LibraryMoudle());
 	}
 	
 	@Provides
