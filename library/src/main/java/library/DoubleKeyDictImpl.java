@@ -111,23 +111,14 @@ public class DoubleKeyDictImpl<K, T, V> implements DoubleKeyDict<K, T, V> {
 
 	@Override
 	public CompletableFuture<Optional<V>> findByKeys(K mainKey, T secondaryKey) {
-//		return mainKeyDict.find(mainKey).thenApply(o -> o.map(new Function<String, CompletableFuture<Optional<V>>>() {
-//
-//			@Override
-//			public CompletableFuture<Optional<V>> apply(String s){
-//				String[] lines = s.split(",");
-//				int start,end;
-//				try{
-//					start = Integer.parseInt(lines[0]);
-//					end = Integer.parseInt(lines[1]);
-//				}catch(NumberFormatException e){
-//					return CompletableFuture.completedFuture(Optional.empty());
-//				}
-//				return BinarySearch.valueOf(values, secondaryKeySerializer.apply(secondaryKey), start, end)//
-//						.thenApply(o -> o.map(valueParser));
-//			}
-//		};)
-		return null;
+		return mainKeyDict.find(mainKey).thenCompose(o -> o.map(s -> {
+			String[] lines = s.split(",");
+			int start, end;
+			start = Integer.parseInt(lines[0]);
+			end = Integer.parseInt(lines[1]);
+			return BinarySearch.valueOf(values, secondaryKeySerializer.apply(secondaryKey), start, end)//
+					.thenApply(val -> val.map(valueParser));
+		}).orElse(CompletableFuture.completedFuture(Optional.empty())));
 	}
 
 	@Override
