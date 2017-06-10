@@ -15,6 +15,8 @@ public class Order {
 	private String user_id;
 	private String price;
 
+	private boolean was_modified;
+
 	public static Order decodeOrder(String decoded) {
 		String[] arr = decoded.split(":");
 		return new Order(arr[0], arr[1], arr[2], arr[3], arr[4]);
@@ -40,6 +42,7 @@ public class Order {
 		this.product_id = product_id;
 		this.amount = amount;
 		this.user_id = user_id;
+		this.was_modified = false;
 	}
 
 	public Order(String status, String product_id, String amount, String user_id, String price) {
@@ -56,6 +59,8 @@ public class Order {
 
 	public void setStatus(String kind) {
 		this.status = kind;
+		if (kind.equals("modified"))
+			this.was_modified = true;
 	}
 
 	public String getProduct_id() {
@@ -87,7 +92,7 @@ public class Order {
 	}
 
 	public boolean isModified() {
-		return "modified".equals(this.status) || isCancelled();
+		return "modified".equals(this.status) || this.was_modified;
 	}
 
 }
