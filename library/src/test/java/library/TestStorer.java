@@ -14,6 +14,35 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 public class TestStorer implements FutureLineStorage {
   private final List<String> lst = new ArrayList<>();
 
+  @Override
+public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((lst == null) ? 0 : lst.hashCode());
+	return result;
+}
+
+@Override
+public boolean equals(Object obj) {
+	if (this == obj)
+		return true;
+	if (obj == null)
+		return false;
+	if (getClass() != obj.getClass())
+		return false;
+	TestStorer other = (TestStorer) obj;
+	if (lst == null) {
+		if (other.lst != null)
+			return false;
+	} else if (!lst.equals(other.lst))
+		return false;
+	return true;
+}
+
+TestStorer(){
+	  
+  }
+  
   @Override public CompletableFuture<Void> appendLine(String line) {
    lst.add(line);
    return null;
