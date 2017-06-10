@@ -3,7 +3,6 @@ package il.ac.technion.cs.sd.buy.test;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -16,7 +15,7 @@ import com.google.inject.Injector;
 import il.ac.technion.cs.sd.buy.app.BuyProductInitializerImpl;
 import il.ac.technion.cs.sd.buy.app.Order;
 
-public class InitializationTest {
+public class BuyProductInitializerTest {
 
 	private static List<String> decodeListStrings(String encoded) {
 		return Arrays.asList((encoded.substring(1).substring(0, encoded.substring(1).length() - 1).split(",")));

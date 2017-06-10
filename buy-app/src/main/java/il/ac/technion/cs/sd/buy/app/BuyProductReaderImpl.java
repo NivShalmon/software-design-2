@@ -26,8 +26,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	private DoubleKeyDict userProductAmount;
 
 	@Inject
-	public BuyProductReaderImpl(Dict productIdToPrice, Dict orderIdToOrder, Dict userIdToOrderIds,
-			Dict productIdToOrderIds, Dict orderIdToHistory, DoubleKeyDict userProductAmount) {
+	public BuyProductReaderImpl(Dict orderIdToOrder, Dict userIdToOrderIds, Dict productIdToOrderIds,
+			Dict orderIdToHistory, DoubleKeyDict userProductAmount) {
 		super();
 		this.orderIdToOrder = orderIdToOrder;
 		this.userIdToOrderIds = userIdToOrderIds;
@@ -59,7 +59,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<Boolean> isModifiedOrder(String s0) {
 		try {
-			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent() && Order.decodeOrder(o.get()).isModified());
+			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent()
+					&& (Order.decodeOrder(o.get()).isModified() || Order.decodeOrder(o.get()).isCancelled()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
