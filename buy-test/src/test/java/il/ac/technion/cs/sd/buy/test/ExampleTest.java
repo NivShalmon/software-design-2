@@ -4,13 +4,10 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import il.ac.technion.cs.sd.buy.app.BuyProductInitializer;
 import il.ac.technion.cs.sd.buy.app.BuyProductReader;
-import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
-import il.ac.technion.cs.sd.buy.ext.LineStorageModule;
-import io.reactivex.subjects.PublishSubject;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +23,7 @@ public class ExampleTest {
 	public Timeout globalTimeout = Timeout.seconds(20);
 
 	private static Injector setupAndGetInjector(String fileName) throws FileNotFoundException {
+		@SuppressWarnings("resource")
 		String fileContents = new Scanner(new File(ExampleTest.class.getResource(fileName).getFile()))
 				.useDelimiter("\\Z").next();
 		Injector injector = Guice.createInjector(new BuyProductModule(), new TestLineStorageModule());

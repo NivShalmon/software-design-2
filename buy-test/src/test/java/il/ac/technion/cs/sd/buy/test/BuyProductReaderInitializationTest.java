@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -283,7 +282,7 @@ public class BuyProductReaderInitializationTest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void test4() {
 		Injector injector = Guice.createInjector(new TestingModule());
@@ -305,7 +304,6 @@ public class BuyProductReaderInitializationTest {
 			assert (reader.isValidOrderId("5").get());
 			assert (reader.isValidOrderId("99").get());
 
-
 			assert (!reader.isCanceledOrder("1").get());
 			assert (!reader.isModifiedOrder("1").get());
 			assert (!reader.isCanceledOrder("2").get());
@@ -313,7 +311,6 @@ public class BuyProductReaderInitializationTest {
 			assert (!reader.isCanceledOrder("3").get());
 			assert (!reader.isModifiedOrder("3").get());
 			assert (reader.isModifiedOrder("4").get());
-
 
 			assert (!reader.getNumberOfProductOrdered("165").get().isPresent());
 			assert (reader.getNumberOfProductOrdered("1").get().isPresent());
@@ -323,7 +320,6 @@ public class BuyProductReaderInitializationTest {
 
 			assertEquals(reader.getOrderIdsForUser("1").get().get(0), "1");
 			assertEquals(reader.getOrderIdsForUser("1").get().size(), 4);
-
 
 			assertEquals(reader.getTotalAmountSpentByUser("1").get().longValue(), 20610);
 			assertEquals(reader.getTotalAmountSpentByUser("15").get().longValue(), 0);
@@ -337,7 +333,7 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getOrderIdsThatPurchased("mac").get().get(1), 99 + "");
 
 			assertEquals(reader.getOrderIdsThatPurchased("windows").get().size(), 1);
-			assertEquals(reader.getOrderIdsThatPurchased("linux").get().size(), 3 );
+			assertEquals(reader.getOrderIdsThatPurchased("linux").get().size(), 3);
 
 			assertEquals(reader.getTotalNumberOfItemsPurchased("mac").get().getAsLong(), 7);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("linux").get().getAsLong(), 210);
@@ -354,29 +350,29 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getModifyRatioForUser("3").get().getAsDouble(), 0, 0.001);
 
 			Map<String, Long> m = new HashMap<>();
-			m.put("linux", 100L);
+			m.put("linux", 110L);
 			m.put("mac", 2L);
 			m.put("windows", 5L);
 
 			Map<String, Long> m1 = new HashMap<>();
 			m1.put("1", 110L);
+			m1.put("2", 100L);
 
 			Map<String, Long> m2 = new HashMap<>();
 			m2.put("1", 5L);
 
 			Map<String, Long> m3 = new HashMap<>();
 			m3.put("1", 2L);
+			m3.put("89", 5L);
 
 			assertEquals(reader.getAllItemsPurchased("1").get(), m);
 			assertEquals(reader.getItemsPurchasedByUsers("linux").get(), m1);
-			assertEquals(reader.getItemsPurchasedByUsers("windows").get(), new HashMap<>());
+			assertEquals(reader.getItemsPurchasedByUsers("windows").get(), m2);
 			assertEquals(reader.getItemsPurchasedByUsers("mac").get(), m3);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 }

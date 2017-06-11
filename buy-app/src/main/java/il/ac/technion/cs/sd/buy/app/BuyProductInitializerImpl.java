@@ -232,12 +232,32 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 		}
 		orderIdToHistory.store();
 
+		Map<String, Map<String, String>> tmpMap = new HashMap<>();
+
 		for (String oid : oids) {
 			String user = tmpOrderIdToOrder.get(oid).getUser_id();
 			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
 			String amount = tmpOrderIdToOrder.get(oid).getAmount();
-			if (!tmpOrderIdToOrder.get(oid).isCancelled())
-				UserProductAmount.add(user, pid, amount);
+			if (!tmpOrderIdToOrder.get(oid).isCancelled()) {
+				if (!tmpMap.containsKey(user)) {
+					tmpMap.put(user, new HashMap<>());
+					tmpMap.get(user).put(pid, amount);
+				} else {
+					if (!tmpMap.get(user).containsKey(pid)) {
+						tmpMap.get(user).put(pid, amount);
+					} else {
+						tmpMap.get(user).put(pid,
+								(Long.parseLong(tmpMap.get(user).get(pid)) + Long.parseLong(amount) + ""));
+					}
+				}
+			}
+		}
+
+		// 1,000,000 at the worst case
+		for (String user : tmpMap.keySet()) {
+			for (String pid : tmpMap.get(user).keySet()) {
+				UserProductAmount.add(user, pid, tmpMap.get(user).get(pid));
+			}
 		}
 
 		orderIdToOrder.store();
