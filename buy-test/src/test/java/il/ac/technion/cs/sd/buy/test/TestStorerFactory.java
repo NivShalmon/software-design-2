@@ -15,7 +15,18 @@ public class TestStorerFactory implements FutureLineStorageFactory {
 	public CompletableFuture<FutureLineStorage> open(String name) {
 		if (!store.containsKey(name))
 			store.put(name, new TestStorer());
-		return CompletableFuture.completedFuture(store.get(name));
+		return CompletableFuture.runAsync(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(store.size()*100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).thenApply(v -> store.get(name));
 	}
 
 }

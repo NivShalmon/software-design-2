@@ -11,7 +11,6 @@ import org.junit.rules.Timeout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.Time;
 import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,7 +35,6 @@ public class BuyProductReaderTest {
     }
 
     public static void setUp(String fileName) throws Exception {
-    	long tick = System.nanoTime();
         injector = Guice.createInjector(new BuyProductModuleFake());
         BuyProductInitializer appInit = injector.getInstance(BuyProductInitializer.class);
         if (fileName.endsWith("xml"))
@@ -45,8 +43,6 @@ public class BuyProductReaderTest {
             assert fileName.endsWith("json");
             appInit.setupJson(setUpFile(fileName));
         }
-        long tock = System.nanoTime();
-        System.out.println((tock - tick)/1000000000.0);
     }
 
     @Test
@@ -226,11 +222,8 @@ public class BuyProductReaderTest {
     @Test
     public void nonExistingOrderShouldNotReturnAnyAmount() throws Exception {
         setUp("ourData.xml");
-        long tick = System.nanoTime();
         BuyProductReader reader = injector.getInstance(BuyProductReader.class);
         Assert.assertEquals(OptionalInt.empty(), reader.getNumberOfProductOrdered("4").get());
-        long tock = System.nanoTime();
-        System.out.println((tock - tick)/1000000000.0);
     }
 
     @Test

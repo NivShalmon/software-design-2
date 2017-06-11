@@ -24,28 +24,33 @@ class FutureLineStorageFactoryFake implements FutureLineStorageFactory {
 
 		@Override
 		public CompletableFuture<String> read(int lineNumber) {
-			return CompletableFuture.completedFuture(list.get(lineNumber)).thenApply(s -> {
-				try {
-					Thread.sleep(s.length());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			String $ = list.get(lineNumber);
+			return CompletableFuture.runAsync(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep($.length());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				return s;
-			});
+			}).thenApply(v -> $);
 		}
 
 		@Override
 		public CompletableFuture<Integer> numberOfLines() {
-			return CompletableFuture.completedFuture(list.size()).thenApply(i -> {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			return CompletableFuture.runAsync(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				return i;
-			});
+			}).thenApply(v -> list.size());
 		}
 
 		public CompletableFuture<List<String>> getFileContent() {
@@ -60,14 +65,17 @@ class FutureLineStorageFactoryFake implements FutureLineStorageFactory {
 	public CompletableFuture<FutureLineStorage> open(String fileName) {
 		if (!files.containsKey(fileName))
 			files.put(fileName, new FutureLineStorageFake());
-		return CompletableFuture.completedFuture(files.get(fileName)).thenApply(i -> {
-			try {
-				Thread.sleep(files.size() * 100);
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
+		return CompletableFuture.runAsync(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(files.size() * 100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			return i;
-		});
+		}).thenApply(v -> files.get(fileName));
 	}
 
 	public void clean() {
