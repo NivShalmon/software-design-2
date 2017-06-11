@@ -148,7 +148,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	public CompletableFuture<OptionalDouble> getAverageNumberOfItemsPurchased(String s0) {
 		CompletableFuture<OptionalLong> total = getTotalNumberOfItemsPurchased(s0);
 		CompletableFuture<Integer> size = getUsersThatPurchasedAndNotCanecelled(s0);
-		return total.thenCombine(size, (t, s) -> OptionalDouble.of(s == 0 || !t.isPresent() ? 0 : t.getAsLong() / s));
+		return total.thenCombine(size, (t, s) -> !t.isPresent() ? OptionalDouble.empty()
+				: OptionalDouble.of(s == 0 ? 0 : (double) t.getAsLong() / s));
 	}
 
 	@Override
@@ -159,7 +160,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
 			CompletableFuture<Integer> cancelled = orders
 					.thenApply(o -> o.stream().filter(i -> i.isCancelled()).collect(Collectors.toList()).size());
-			return total.thenCombine(cancelled, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : c / t));
+			return total.thenCombine(cancelled, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : (double) c / t));
 		});
 
 	}
@@ -178,7 +179,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
 			CompletableFuture<Integer> modified = orders
 					.thenApply(o -> o.stream().filter(i -> i.isModified()).collect(Collectors.toList()).size());
-			return total.thenCombine(modified, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : c / t));
+			return total.thenCombine(modified, (t, c) -> OptionalDouble.of(t == 0 || c == 0 ? 0 : (double) c / t));
 		});
 	}
 
