@@ -45,27 +45,35 @@ TestStorer(){
   
   @Override public CompletableFuture<Void> appendLine(String line) {
    lst.add(line);
-   return CompletableFuture.completedFuture("a").thenAccept(s->{});
+   return CompletableFuture.completedFuture(null);
   }
   
   @Override public CompletableFuture<String> read(int lineNumber) {
     String $ = lst.get(lineNumber);
-    try {
-		Thread.sleep($.length());
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-    return CompletableFuture.completedFuture($);
+    return CompletableFuture.runAsync(new Runnable() {
+		@Override
+		public void run() {
+			try {
+				Thread.sleep($.length());
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}).thenApply(v -> $);
   }
   
   @Override public CompletableFuture<Integer> numberOfLines() {
-	try {
-		Thread.sleep(lst.size());
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-    return CompletableFuture.completedFuture(lst.size());
+	    return CompletableFuture.runAsync(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}).thenApply(v -> lst.size());
   }
 }
