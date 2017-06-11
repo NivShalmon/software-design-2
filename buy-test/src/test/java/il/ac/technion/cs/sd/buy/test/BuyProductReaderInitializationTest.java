@@ -122,10 +122,19 @@ public class BuyProductReaderInitializationTest {
 			m.put("windows", 5L);
 			m.put("mac", 2L);
 
+			Map<String, Long> m1 = new HashMap<>();
+			m1.put("1", 100L);
+
+			Map<String, Long> m2 = new HashMap<>();
+			m2.put("1", 5L);
+
+			Map<String, Long> m3 = new HashMap<>();
+			m3.put("1", 2L);
+
 			assertEquals(reader.getAllItemsPurchased("1").get(), m);
-			// TODO: check it !
-			// assertEquals(reader.getItemsPurchasedByUsers("2").get(), new
-			// HashMap<>());
+			assertEquals(reader.getItemsPurchasedByUsers("linux").get(), m1);
+			assertEquals(reader.getItemsPurchasedByUsers("windows").get(), m2);
+			assertEquals(reader.getItemsPurchasedByUsers("mac").get(), m3);
 
 		} catch (Exception e) {
 			e.printStackTrace();
