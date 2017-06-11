@@ -48,7 +48,7 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getTotalNumberOfItemsPurchased("android").get().getAsLong(), 0);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 1, 0.001);
-			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
+			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 1, 0.001);
 			assertEquals(reader.getAllItemsPurchased("1").get(), new HashMap<>());
 			assertEquals(reader.getItemsPurchasedByUsers("1").get(), new HashMap<>());
 
@@ -135,6 +135,66 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getItemsPurchasedByUsers("linux").get(), m1);
 			assertEquals(reader.getItemsPurchasedByUsers("windows").get(), m2);
 			assertEquals(reader.getItemsPurchasedByUsers("mac").get(), m3);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void test2() {
+		Injector injector = Guice.createInjector(new TestingModule());
+		BuyProductInitializerImpl init = injector.getInstance(BuyProductInitializerImpl.class);
+		Scanner scanner;
+		try {
+			scanner = new Scanner(
+					new File("../buy-test/src/test/resources/il/ac/technion/cs/sd/buy/test/small_2.json"));
+			String text = scanner.useDelimiter("\\A").next();
+			scanner.close();
+			init.setupJson(text);
+			BuyProductReader reader = new BuyProductReaderImpl(init.getOrderIdToOrder(), init.getUserIdToOrderIds(),
+					init.getProductIdToOrderIds(), init.getOrderIdToHistory(), init.getUserProductAmount());
+
+			assert (!reader.isValidOrderId("jhv").get());
+			assert (reader.isValidOrderId("foo1234").get());
+			assert (!reader.isValidOrderId("2").get());
+			assert (!reader.isValidOrderId("3").get());
+			assert (!reader.isValidOrderId("4").get());
+
+			assert (!reader.isCanceledOrder("1").get());
+			assert (!reader.isModifiedOrder("1").get());
+			assert (!reader.isCanceledOrder("2").get());
+			assert (!reader.isModifiedOrder("2").get());
+			assert (!reader.isCanceledOrder("3").get());
+			assert (!reader.isModifiedOrder("3").get());
+
+			assert (!reader.getNumberOfProductOrdered("165").get().isPresent());
+			assert (reader.getNumberOfProductOrdered("foo1234").get().isPresent());
+
+			assertEquals(reader.getNumberOfProductOrdered("foo1234").get().getAsInt(), -10);
+			assertEquals(reader.getHistoryOfOrder("1").get().size(), 0);
+			assertEquals(reader.getHistoryOfOrder("foo1234").get().size(), 3);
+
+			assertEquals(reader.getOrderIdsForUser("foo1234").get().get(0), "foo1234");
+
+			assertEquals(reader.getTotalAmountSpentByUser("1").get().longValue(), 0);
+			assertEquals(reader.getTotalAmountSpentByUser("foo1234").get().longValue(), 0);
+
+			assertEquals(reader.getTotalAmountSpentByUser("15").get().longValue(), 0);
+
+			assertEquals(reader.getUsersThatPurchased("android").get().size(), 0);
+			assertEquals(reader.getUsersThatPurchased("foo1234").get().size(), 0);
+
+			assertEquals(reader.getOrderIdsThatPurchased("foo1234").get().get(0), "foo1234");
+			assertEquals(reader.getOrderIdsThatPurchased("foo1234").get().size(), 1);
+
+			assertEquals(reader.getTotalNumberOfItemsPurchased("foo1234").get().getAsLong(), 0);
+
+			assertEquals(reader.getCancelRatioForUser("foo1234").get().getAsDouble(), 1, 0.001);
+			assertEquals(reader.getModifyRatioForUser("foo1234").get().getAsDouble(), 1, 0.001);
+
+			assertEquals(reader.getAllItemsPurchased("foo1234").get(), new HashMap<>());
+			assertEquals(reader.getItemsPurchasedByUsers("foo1234").get(), new HashMap<>());
 
 		} catch (Exception e) {
 			e.printStackTrace();

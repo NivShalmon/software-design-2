@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 public class Order {
 	@Override
 	public String toString() {
-		return status + ":" + product_id + ":" + amount + ":" + user_id + ":" + price;
+		return status + ":" + product_id + ":" + amount + ":" + user_id + ":" + price + ":" + was_modified;
 	}
 
 	private String status;
@@ -19,13 +19,13 @@ public class Order {
 
 	public static Order decodeOrder(String decoded) {
 		String[] arr = decoded.split(":");
-		return new Order(arr[0], arr[1], arr[2], arr[3], arr[4]);
+		return new Order(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
 	}
 
 	public static CompletableFuture<Optional<Order>> decodeOrder(CompletableFuture<Optional<String>> find) {
 		return find.thenApply(decoded -> {
 			String[] arr = decoded.get().split(":");
-			return Optional.of(new Order(arr[0], arr[1], arr[2], arr[3], arr[4]));
+			return Optional.of(new Order(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]));
 		});
 	}
 
@@ -45,12 +45,13 @@ public class Order {
 		this.was_modified = false;
 	}
 
-	public Order(String status, String product_id, String amount, String user_id, String price) {
+	public Order(String status, String product_id, String amount, String user_id, String price, String was_modified) {
 		this.status = status;
 		this.product_id = product_id;
 		this.amount = amount;
 		this.user_id = user_id;
 		this.price = price;
+		this.was_modified = Boolean.parseBoolean(was_modified);
 	}
 
 	public String getStatus() {
