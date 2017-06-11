@@ -62,8 +62,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<Boolean> isModifiedOrder(String s0) {
 		try {
-			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent()
-					&& (Order.decodeOrder(o.get()).isModified() || Order.decodeOrder(o.get()).isCancelled()));
+			return orderIdToOrder.find(s0).thenApply(o -> o.isPresent() && (Order.decodeOrder(o.get()).isModified()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -45,7 +45,7 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getOrderIdsThatPurchased("android").get().size(), 1);
 			assertEquals(reader.getOrderIdsThatPurchased("iphone").get().size(), 0);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("android").get().getAsLong(), 0);
-			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
+			assert (!reader.getTotalNumberOfItemsPurchased("iphone").get().isPresent());
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 1, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 1, 0.001);
 			assertEquals(reader.getAllItemsPurchased("1").get(), new HashMap<>());
@@ -105,7 +105,7 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getTotalNumberOfItemsPurchased("mac").get().getAsLong(), 2);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("linux").get().getAsLong(), 100);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("windows").get().getAsLong(), 5);
-			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
+			assert (!reader.getTotalNumberOfItemsPurchased("iphone").get().isPresent());
 
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
@@ -245,8 +245,8 @@ public class BuyProductReaderInitializationTest {
 
 			assertEquals(reader.getTotalNumberOfItemsPurchased("mac").get().getAsLong(), 2);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("linux").get().getAsLong(), 100);
-			assertEquals(reader.getTotalNumberOfItemsPurchased("windows").get().getAsLong(), 0);
-			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
+			assert (!reader.getTotalNumberOfItemsPurchased("windows").get().isPresent());
+			assert (!reader.getTotalNumberOfItemsPurchased("iphone").get().isPresent());
 
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
@@ -335,7 +335,6 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getTotalNumberOfItemsPurchased("mac").get().getAsLong(), 7);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("linux").get().getAsLong(), 210);
 			assertEquals(reader.getTotalNumberOfItemsPurchased("windows").get().getAsLong(), 5);
-			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
 
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0.25, 0.001);

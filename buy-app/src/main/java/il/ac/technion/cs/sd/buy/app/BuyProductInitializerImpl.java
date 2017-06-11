@@ -174,7 +174,12 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 		if (tmpOrderIdToOrder.containsKey(order_id)) {
 			tmpOrderIdToOrder.get(order_id).setStatus("modified");
 			tmpOrderIdToOrder.get(order_id).setAmount(amount);
-			tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+			if (tmpOrderIdToHistory.get(order_id).get(tmpOrderIdToHistory.get(order_id).size() - 1).equals(Integer.parseInt("-1"))) {
+				tmpOrderIdToHistory.get(order_id).set(tmpOrderIdToHistory.get(order_id).size() - 1,Integer.parseInt(amount));
+			}
+			else{
+				tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
+			}
 
 		}
 	}
