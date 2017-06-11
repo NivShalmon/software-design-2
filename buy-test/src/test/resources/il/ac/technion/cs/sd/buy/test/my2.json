@@ -1,0 +1,14 @@
+[
+  {"type": "order", "order-id": "1", "user-id": "1", "product-id": "windows", "amount": 10},
+
+  {"type": "order", "order-id": "1", "user-id": "1", "product-id": "mac", "amount": 2},
+  {"type": "order", "order-id": "2", "user-id": "1", "product-id": "windows", "amount": 5},
+  {"type": "order", "order-id": "3", "user-id": "1", "product-id": "linux", "amount": 100},
+  {"type": "order", "order-id": "4", "user-id": "1", "product-id": "linux", "amount": 100},
+  {"type": "order", "order-id": "5", "user-id": "2", "product-id": "linux", "amount": 100},
+  {"type": "order", "order-id": "99", "user-id": "89", "product-id": "mac", "amount": 5},
+  {"type": "modify-order", "order-id": "4", "amount": 10},
+  {"type": "product", "id": "linux", "price": 1},
+  {"type": "product", "id": "mac", "price": 10000},
+  {"type": "product", "id": "windows", "price": 100}
+]
