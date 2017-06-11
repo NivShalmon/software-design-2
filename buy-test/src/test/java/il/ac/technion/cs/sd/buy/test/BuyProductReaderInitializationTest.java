@@ -110,11 +110,8 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
 
-			assertEquals(reader.getCancelRatioForUser("2").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("2").get().getAsDouble(), 0, 0.001);
-
-			assertEquals(reader.getCancelRatioForUser("3").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("3").get().getAsDouble(), 0, 0.001);
+			assert (!reader.getCancelRatioForUser("3").get().isPresent());
+			assert (!reader.getModifyRatioForUser("3").get().isPresent());
 
 			Map<String, Long> m = new HashMap<>();
 			m.put("linux", 100L);
@@ -254,11 +251,11 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
 
-			assertEquals(reader.getCancelRatioForUser("2").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("2").get().getAsDouble(), 0, 0.001);
+			assert (!reader.getCancelRatioForUser("2").get().isPresent());
+			assert (!reader.getModifyRatioForUser("2").get().isPresent());
 
-			assertEquals(reader.getCancelRatioForUser("3").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("3").get().getAsDouble(), 0, 0.001);
+			assert (!reader.getCancelRatioForUser("3").get().isPresent());
+			assert (!reader.getModifyRatioForUser("3").get().isPresent());
 
 			Map<String, Long> m = new HashMap<>();
 			m.put("linux", 100L);
@@ -341,13 +338,13 @@ public class BuyProductReaderInitializationTest {
 			assertEquals(reader.getTotalNumberOfItemsPurchased("iphone").get().getAsLong(), 0);
 
 			assertEquals(reader.getCancelRatioForUser("1").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0, 0.001);
+			assertEquals(reader.getModifyRatioForUser("1").get().getAsDouble(), 0.25, 0.001);
 
 			assertEquals(reader.getCancelRatioForUser("2").get().getAsDouble(), 0, 0.001);
 			assertEquals(reader.getModifyRatioForUser("2").get().getAsDouble(), 0, 0.001);
 
-			assertEquals(reader.getCancelRatioForUser("3").get().getAsDouble(), 0, 0.001);
-			assertEquals(reader.getModifyRatioForUser("3").get().getAsDouble(), 0, 0.001);
+			assert (!reader.getCancelRatioForUser("3").get().isPresent());
+			assert (!reader.getModifyRatioForUser("3").get().isPresent());
 
 			Map<String, Long> m = new HashMap<>();
 			m.put("linux", 110L);

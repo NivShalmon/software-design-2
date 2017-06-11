@@ -156,6 +156,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	public CompletableFuture<OptionalDouble> getCancelRatioForUser(String s0) {
 
 		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			if (!orderIds.isPresent())
+				return CompletableFuture.completedFuture(OptionalDouble.empty());
 			CompletableFuture<List<Order>> orders = getOrders(decodeListStringsOptional(orderIds));
 			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
 			CompletableFuture<Integer> cancelled = orders
@@ -175,6 +177,8 @@ public class BuyProductReaderImpl implements BuyProductReader {
 	@Override
 	public CompletableFuture<OptionalDouble> getModifyRatioForUser(String s0) {
 		return userIdToOrderIds.find(s0).thenCompose(orderIds -> {
+			if (!orderIds.isPresent())
+				return CompletableFuture.completedFuture(OptionalDouble.empty());
 			CompletableFuture<List<Order>> orders = getOrders(decodeListStringsOptional(orderIds));
 			CompletableFuture<Integer> total = orders.thenApply(lst -> lst.size());
 			CompletableFuture<Integer> modified = orders
