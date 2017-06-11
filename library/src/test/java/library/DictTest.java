@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -14,7 +15,7 @@ import com.google.inject.Injector;
 public class DictTest {
 	static Injector injector = Guice.createInjector(new TestLineStorageModule(),new LibraryModule());
 	static DictFactory f = injector.getInstance(DictFactory.class);
-
+	
 	@Test()
 	public void test0() throws InterruptedException, ExecutionException {
 		Dict testDict = f.create("test0");
@@ -33,11 +34,11 @@ public class DictTest {
 		//
 		assertThat(testDict.find("asdf").get(), is(Optional.empty()));
 	}
-
-	@Test()
+	
+	@Test
 	public void test2() throws Exception {
 		Dict testDict = f.create("test2");
-		for (int i = 0; i < 3339; i++) {
+		for (int i = 0; i < 1000000; i++) {
 			testDict.add(i + "", i + "");
 		}
 		testDict.store();
