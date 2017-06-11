@@ -181,90 +181,91 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 
 	private void initialStructures() {
 
-		// clear all the old orders
-		Set<String> oids = tmpOrderIdToOrder.keySet();
-		Set<String> temp = new HashSet<>();
-		temp.addAll(oids);
-		for (String oid : temp) {
-			if (tmpProductIdToPrice.containsKey(tmpOrderIdToOrder.get(oid).getProduct_id())) {
-				tmpOrderIdToOrder.get(oid)
-						.setPrice(tmpProductIdToPrice.get(tmpOrderIdToOrder.get(oid).getProduct_id()));
-			} else {
-				tmpOrderIdToOrder.remove(oid);
-				tmpOrderIdToHistory.remove(oid);
+		try {
+			// clear all the old orders
+			Set<String> oids = tmpOrderIdToOrder.keySet();
+			Set<String> temp = new HashSet<>();
+			temp.addAll(oids);
+			for (String oid : temp) {
+				if (tmpProductIdToPrice.containsKey(tmpOrderIdToOrder.get(oid).getProduct_id())) {
+					tmpOrderIdToOrder.get(oid)
+							.setPrice(tmpProductIdToPrice.get(tmpOrderIdToOrder.get(oid).getProduct_id()));
+				} else {
+					tmpOrderIdToOrder.remove(oid);
+					tmpOrderIdToHistory.remove(oid);
+				}
+
 			}
 
-		}
+			oids = tmpOrderIdToOrder.keySet();
+			for (String oid : oids) {
+				String user = tmpOrderIdToOrder.get(oid).getUser_id();
+				String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
+				if (!tmpUserIdToOrderIds.containsKey(user))
+					tmpUserIdToOrderIds.put(user, new ArrayList<>());
 
-		oids = tmpOrderIdToOrder.keySet();
-		for (String oid : oids) {
-			String user = tmpOrderIdToOrder.get(oid).getUser_id();
-			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
-			if (!tmpUserIdToOrderIds.containsKey(user))
-				tmpUserIdToOrderIds.put(user, new ArrayList<>());
+				if (!tmpProductIdToOrderIds.containsKey(pid))
+					tmpProductIdToOrderIds.put(pid, new ArrayList<>());
 
-			if (!tmpProductIdToOrderIds.containsKey(pid))
-				tmpProductIdToOrderIds.put(pid, new ArrayList<>());
+				tmpUserIdToOrderIds.get(user).add(oid);
+				tmpProductIdToOrderIds.get(pid).add(oid);
 
-			tmpUserIdToOrderIds.get(user).add(oid);
-			tmpProductIdToOrderIds.get(pid).add(oid);
+			}
 
-		}
+			// Add to the actual structures
+			for (String oid : tmpOrderIdToOrder.keySet()) {
+				orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+", ""));
+			}
+			orderIdToOrder.store().get();
 
-		// Add to the actual structures
-		for (String oid : tmpOrderIdToOrder.keySet()) {
-			orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+", ""));
-		}
-		orderIdToOrder.store();
+			for (String user : tmpUserIdToOrderIds.keySet()) {
+				userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+", ""));
+			}
+			userIdToOrderIds.store().get();
 
-		for (String user : tmpUserIdToOrderIds.keySet()) {
-			userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+", ""));
-		}
-		userIdToOrderIds.store();
+			for (String pid : tmpProductIdToOrderIds.keySet()) {
+				productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+", ""));
+			}
+			productIdToOrderIds.store().get();
 
-		for (String pid : tmpProductIdToOrderIds.keySet()) {
-			productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+", ""));
-		}
-		productIdToOrderIds.store();
+			for (String oid : tmpOrderIdToHistory.keySet()) {
+				orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+", ""));
+			}
+			orderIdToHistory.store().get();
 
-		for (String oid : tmpOrderIdToHistory.keySet()) {
-			orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+", ""));
-		}
-		orderIdToHistory.store();
+			Map<String, Map<String, String>> tmpMap = new HashMap<>();
 
-		Map<String, Map<String, String>> tmpMap = new HashMap<>();
-
-		for (String oid : oids) {
-			String user = tmpOrderIdToOrder.get(oid).getUser_id();
-			String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
-			String amount = tmpOrderIdToOrder.get(oid).getAmount();
-			if (!tmpOrderIdToOrder.get(oid).isCancelled()) {
-				if (!tmpMap.containsKey(user)) {
-					tmpMap.put(user, new HashMap<>());
-					tmpMap.get(user).put(pid, amount);
-				} else {
-					if (!tmpMap.get(user).containsKey(pid)) {
+			for (String oid : oids) {
+				String user = tmpOrderIdToOrder.get(oid).getUser_id();
+				String pid = tmpOrderIdToOrder.get(oid).getProduct_id();
+				String amount = tmpOrderIdToOrder.get(oid).getAmount();
+				if (!tmpOrderIdToOrder.get(oid).isCancelled()) {
+					if (!tmpMap.containsKey(user)) {
+						tmpMap.put(user, new HashMap<>());
 						tmpMap.get(user).put(pid, amount);
 					} else {
-						tmpMap.get(user).put(pid,
-								(Long.parseLong(tmpMap.get(user).get(pid)) + Long.parseLong(amount) + ""));
+						if (!tmpMap.get(user).containsKey(pid)) {
+							tmpMap.get(user).put(pid, amount);
+						} else {
+							tmpMap.get(user).put(pid,
+									(Long.parseLong(tmpMap.get(user).get(pid)) + Long.parseLong(amount) + ""));
+						}
 					}
 				}
 			}
-		}
 
-		// 1,000,000 at the worst case
-		for (String user : tmpMap.keySet()) {
-			for (String pid : tmpMap.get(user).keySet()) {
-				UserProductAmount.add(user, pid, tmpMap.get(user).get(pid));
+			// 1,000,000 at the worst case
+			for (String user : tmpMap.keySet()) {
+				for (String pid : tmpMap.get(user).keySet()) {
+					UserProductAmount.add(user, pid, tmpMap.get(user).get(pid));
+				}
 			}
-		}
 
-		orderIdToOrder.store();
-		userIdToOrderIds.store();
-		productIdToOrderIds.store();
-		orderIdToHistory.store();
-		UserProductAmount.store();
+			UserProductAmount.store().get();
+
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
 
 	}
 
