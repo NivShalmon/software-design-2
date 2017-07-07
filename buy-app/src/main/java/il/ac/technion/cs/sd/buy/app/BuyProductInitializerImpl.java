@@ -111,7 +111,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			e.printStackTrace();
 		}
 
-		return null;
+		return CompletableFuture.completedFuture(null);
 	}
 
 	@Override
@@ -153,7 +153,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return CompletableFuture.completedFuture(null);
 	}
 
 	private void addOrder(String order_id, String user_id, String product_id, String amount, String status) {
