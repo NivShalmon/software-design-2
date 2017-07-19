@@ -150,7 +150,7 @@ public class BuyProductReaderImpl implements BuyProductReader {
 		CompletableFuture<OptionalLong> total = getTotalNumberOfItemsPurchased(s0);
 		CompletableFuture<Integer> size = getUsersThatPurchasedAndNotCanecelled(s0);
 		return total.thenCombine(size, (t, s) -> !t.isPresent() ? OptionalDouble.empty()
-				: OptionalDouble.of(s == 0 ? 0 : (double) t.getAsLong() / s));
+				: (s == 0 ? OptionalDouble.empty() : OptionalDouble.of((double) t.getAsLong() / s)));
 	}
 
 	@Override

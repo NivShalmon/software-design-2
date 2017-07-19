@@ -269,7 +269,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			UserProductAmount.store().get();
 
 		} catch (Exception e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 
 	}
