@@ -36,10 +36,12 @@ class TestingLineStorageModule extends AbstractModule {
     @Override
     public CompletableFuture<FutureLineStorage> open(String fileName) {
       return swallowException(() -> {
-        if (!map.containsKey(fileName))
-          map.put(fileName, new FutureLineStorageImpl());
-        Thread.sleep(map.size() * 100);
-        return map.get(fileName);
+		synchronized(FutureLineStorageFactoryImpl.this) {
+          if (!map.containsKey(fileName))
+            map.put(fileName, new FutureLineStorageImpl());
+          Thread.sleep(map.size() * 100);
+          return map.get(fileName);
+		}
       });
     }
 
