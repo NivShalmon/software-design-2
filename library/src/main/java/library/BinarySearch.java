@@ -14,13 +14,12 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 class BinarySearch {
 	
 	/**
-	 * a version of valueOf where the high parameter is also
-	 * a completable future, to allow using {@link FutureLineStorage#numberOfLines()}
-	 * as the high value 
+	 * same as {@link #valueOf(CompletableFuture, String, int, int)}, except
+	 * high is the number of lines in the {@link FutureLineStorage}  
 	 * @see {@link #valueOf(CompletableFuture, String, int, int)}
 	 */
-	static CompletableFuture<Optional<String>> valueOf(CompletableFuture<FutureLineStorage> storer, String key, int low, CompletableFuture<Integer> high){
-		return high.thenCompose(h -> valueOf(storer,key,low,h));
+	static CompletableFuture<Optional<String>> valueOf(CompletableFuture<FutureLineStorage> storer, String key, int low){
+		return storer.thenCompose(fls->fls.numberOfLines()).thenCompose(high->valueOf(storer,key,low,high));
 	}
 	
 	/**
@@ -34,19 +33,19 @@ class BinarySearch {
 	 * key doesn't exist
 	 */
 	static CompletableFuture<Optional<String>> valueOf(CompletableFuture<FutureLineStorage> storer, String key, int low, int high) {
-		return of(storer,key,low/2,high/2-1);
+		return storer.thenCompose(fls -> of(fls,key,low/2,high/2-1));
 	}
 	
-	private static CompletableFuture<Optional<String>> of(CompletableFuture<FutureLineStorage> storer, String key, int low, int high) {
+	private static CompletableFuture<Optional<String>> of(FutureLineStorage storer, String key, int low, int high) {
 		if (high < low)
 			return CompletableFuture.completedFuture(Optional.empty());
 		final int mid = (low + high) / 2;
-		return storer.thenCompose(s->s.read(2 * mid)).thenCompose(new Function<String, CompletableFuture<Optional<String>>>() {
+		return storer.read(2 * mid).thenCompose(new Function<String, CompletableFuture<Optional<String>>>() {
 			@Override
 			public CompletableFuture<Optional<String>> apply(String current) {
 				int comparison = current.compareTo(key);
 				if (comparison == 0)
-					return storer.thenCompose(s->s.read(2 * mid + 1)).thenApply(s -> Optional.of(s));
+					return storer.read(2 * mid + 1).thenApply(s -> Optional.of(s));
 				if (comparison < 0)
 					return of(storer,key,mid+1,high);
 				return of(storer,key,low,mid-1);

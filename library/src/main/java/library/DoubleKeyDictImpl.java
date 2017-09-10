@@ -11,6 +11,7 @@ import com.google.inject.assistedinject.Assisted;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
+import static library.Util.*;
 
 /**
  * The provided implementation of {@link DoubleKeyDict}, using
@@ -58,6 +59,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storingStatus);
 		storingStatus = storeDict(secondaryKeyDict, secondaryKeyMap, currentLine, storingStatus);
 		return storingStatus.thenAccept(s -> {
+			// empty block to turn this into CompletableFuture<Void>
 		});
 	}
 
@@ -66,13 +68,12 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 		CompletableFuture<?> status = currentStatus;
 		for (String key : m.keySet()) {
 			Map<String, String> current = m.get(key);
-			status = DictImpl.storeToStorage(current, storer, status);
+			status = storeToStorage(current, storer, status);
 			int startingLine = currentLine.val;
 			currentLine.val += current.size() * 2;
 			dict.add(key, startingLine + "," + currentLine);
 		}
-		dict.store();
-		return status;
+		return status.thenCompose(v->dict.store());
 	}
 
 	private void addToMap(final Map<String, Map<String, String>> m, String key1, String key2, String value) {
