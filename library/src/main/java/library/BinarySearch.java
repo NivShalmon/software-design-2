@@ -2,6 +2,7 @@ package library;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
@@ -45,7 +46,15 @@ class BinarySearch {
 			public CompletableFuture<Optional<String>> apply(String current) {
 				int comparison = current.compareTo(key);
 				if (comparison == 0)
-					return storer.read(2 * mid + 1).thenApply(s -> Optional.of(s));
+					try {
+						return CompletableFuture.completedFuture(storer.read(2 * mid + 1).thenApply(s -> Optional.of(s)).get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				if (comparison < 0)
 					return of(storer,key,mid+1,high);
 				return of(storer,key,low,mid-1);
