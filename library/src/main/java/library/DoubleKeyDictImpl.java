@@ -73,7 +73,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 			currentLine.val += current.size() * 2;
 			dict.add(key, startingLine + "," + currentLine);
 		}
-		return status = status.thenCompose(v->dict.store());
+		return status.thenCompose(v->dict.store());
 	}
 
 	private void addToMap(final Map<String, Map<String, String>> m, String key1, String key2, String value) {
@@ -106,7 +106,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	private CompletableFuture<Map<String, String>> findByKey(Dict d, String key) {
 		return d.find(key).thenApply(o -> o.map(str -> {
 			Map<String, String> $ = new HashMap<>();
-			String[] lines = str.split(",");
+			String[] lines = o.get().split(",");
 			int end = Integer.parseInt(lines[1]);
 			try {
 				storingStatus.get();
