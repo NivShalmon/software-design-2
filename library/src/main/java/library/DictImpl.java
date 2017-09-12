@@ -30,7 +30,7 @@ public class DictImpl implements Dict {
 	}
 
 	public CompletableFuture<Void> store() {
-		return (storingStatus = storeToStorage(pairs, storer, storingStatus))//
+		return (storingStatus = storeToStorage(pairs, storer, storer))//
 				.thenAccept(s -> {
 					// empty block to turn this into CompletableFuture<Void>
 				});

@@ -73,7 +73,7 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 			currentLine.val += current.size() * 2;
 			dict.add(key, startingLine + "," + currentLine);
 		}
-		return status.thenCompose(v->dict.store());
+		return status = status.thenCompose(v->dict.store());
 	}
 
 	private void addToMap(final Map<String, Map<String, String>> m, String key1, String key2, String value) {
