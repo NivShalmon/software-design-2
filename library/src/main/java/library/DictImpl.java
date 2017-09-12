@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
@@ -19,28 +20,34 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
  *      create an instance
  */
 public class DictImpl implements Dict {
-	private final CompletableFuture<FutureLineStorage> storer;
+	private final FutureLineStorage storer;
 	private final Map<String, String> pairs = new HashMap<>();
-	private CompletableFuture<?> storingStatus;
 
 	@Inject
 	DictImpl(FutureLineStorageFactory factory, //
 			@Assisted String name) {
-		storingStatus = storer = factory.open(name);
+		try {
+			storer = factory.open(name).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public CompletableFuture<Void> store() {
-		return (storingStatus = storeToStorage(pairs, storer, storer)).thenAccept(s -> {
+		return storeToStorage(pairs, storer).thenAccept(s -> {
 		});
 	}
 
-	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store,
-			CompletableFuture<?> current) {
-		for (String key : map.keySet().stream().sorted().collect(Collectors.toList())) {
-			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(key)));
-			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(map.get(key))));
+	static CompletableFuture<Void> storeToStorage(Map<String, String> map, FutureLineStorage store) {
+		try {
+			for (String key : map.keySet().stream().sorted().collect(Collectors.toList())) {
+				store.appendLine(key).get();
+				store.appendLine(map.get(key)).get();
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
 		}
-		return current;
+		return CompletableFuture.completedFuture(null);
 	}
 
 	@Override
@@ -55,7 +62,6 @@ public class DictImpl implements Dict {
 
 	@Override
 	public CompletableFuture<Optional<String>> find(String key) {
-		return storingStatus
-				.thenCompose(v -> BinarySearch.valueOf(storer, key, 0, storer.thenCompose(s -> s.numberOfLines())));
+		return BinarySearch.valueOf(storer, key, 0, storer.numberOfLines());
 	}
 }

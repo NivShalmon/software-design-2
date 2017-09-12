@@ -22,8 +22,7 @@ import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
 public class DoubleKeyDictImpl implements DoubleKeyDict {
 	private final Dict mainKeyDict;
 	private final Dict secondaryKeyDict;
-	private CompletableFuture<?> storingStatus;
-	private final CompletableFuture<FutureLineStorage> storer;
+	private final FutureLineStorage storer;
 	private final Map<String, Map<String, String>> mainKeyMap = new HashMap<>();
 	private final Map<String, Map<String, String>> secondaryKeyMap = new HashMap<>();
 
@@ -42,7 +41,11 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 	@Inject
 	public DoubleKeyDictImpl(DictFactory dictFactory, FutureLineStorageFactory lineStorageFactory,
 			@Assisted String name) {
-		storingStatus = storer = lineStorageFactory.open(name + ".valuesMap");
+		try {
+			storer = lineStorageFactory.open(name + ".valuesMap").get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
 		mainKeyDict = dictFactory.create(name + ".mainKeyMap");
 		secondaryKeyDict = dictFactory.create(name + ".secondaryKeyMap");
 	}
@@ -55,24 +58,25 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 
 	public CompletableFuture<Void> store() {
 		IntegerWrapper currentLine = new IntegerWrapper();
-		storingStatus = storeDict(mainKeyDict, mainKeyMap, currentLine, storingStatus);
-		storingStatus = storeDict(secondaryKeyDict, secondaryKeyMap, currentLine, storingStatus);
-		return storingStatus.thenAccept(s -> {
-		});
+		try {
+			storeDict(mainKeyDict, mainKeyMap, currentLine);
+			storeDict(secondaryKeyDict, secondaryKeyMap, currentLine);
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+		return CompletableFuture.completedFuture(null);
 	}
 
-	private CompletableFuture<?> storeDict(final Dict dict, final Map<String, Map<String, String>> m,
-			IntegerWrapper currentLine, CompletableFuture<?> currentStatus) {
-		CompletableFuture<?> status = currentStatus;
+	private void storeDict(final Dict dict, final Map<String, Map<String, String>> m, IntegerWrapper currentLine)
+			throws InterruptedException, ExecutionException {
 		for (String key : m.keySet()) {
 			Map<String, String> current = m.get(key);
-			status = DictImpl.storeToStorage(current, storer, status);
+			DictImpl.storeToStorage(current, storer).get();
 			int startingLine = currentLine.val;
 			currentLine.val += current.size() * 2;
 			dict.add(key, startingLine + "," + currentLine);
 		}
-		dict.store();
-		return status;
+		dict.store().get();
 	}
 
 	private void addToMap(final Map<String, Map<String, String>> m, String key1, String key2, String value) {
@@ -88,13 +92,16 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 
 	@Override
 	public CompletableFuture<Optional<String>> findByKeys(String key1, String key2) {
-		return mainKeyDict.find(key1).thenCompose(o -> {
-			if (!o.isPresent())
-				return CompletableFuture.completedFuture(Optional.empty());
-			String[] lines = o.get().split(",");
-			return storingStatus.thenCompose(
-					v -> BinarySearch.valueOf(storer, key2, Integer.parseInt(lines[0]), Integer.parseInt(lines[1])));
-		});
+		Optional<String> o;
+		try {
+			o = mainKeyDict.find(key1).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
+		if (!o.isPresent())
+			return CompletableFuture.completedFuture(Optional.empty());
+		String[] lines = o.get().split(",");
+		return BinarySearch.valueOf(storer, key2, Integer.parseInt(lines[0]), Integer.parseInt(lines[1]));
 	}
 
 	@Override
@@ -108,11 +115,8 @@ public class DoubleKeyDictImpl implements DoubleKeyDict {
 			String[] lines = o.get().split(",");
 			int end = Integer.parseInt(lines[1]);
 			try {
-				storingStatus.get();
 				for (int i = Integer.parseInt(lines[0]); i < end; i += 2) {
-					final int line = i;
-
-					$.put(storer.thenCompose(s -> s.read(line)).get(), storer.thenCompose(s -> s.read(line + 1)).get());
+					$.put(storer.read(i).get(), storer.read(i + 1).get());
 				}
 			} catch (InterruptedException | ExecutionException e) {
 				return new HashMap<String, String>();
