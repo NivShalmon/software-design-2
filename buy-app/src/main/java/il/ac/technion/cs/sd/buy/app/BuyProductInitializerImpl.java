@@ -105,12 +105,13 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					}
 				}
 			}
-			return initialStructures();
+			initialStructures();
 
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 
+		return CompletableFuture.completedFuture(null);
 	}
 
 	@Override
@@ -147,10 +148,12 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 					addOrder(order_id, user_id, product_id, amount, status);
 				}
 			}
-			return initialStructures();
+
+			initialStructures();
 		} catch (JSONException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
+		return CompletableFuture.completedFuture(null);
 	}
 
 	private void addOrder(String order_id, String user_id, String product_id, String amount, String status) {
@@ -171,24 +174,22 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 		if (tmpOrderIdToOrder.containsKey(order_id)) {
 			tmpOrderIdToOrder.get(order_id).setStatus("modified");
 			tmpOrderIdToOrder.get(order_id).setAmount(amount);
-			if (tmpOrderIdToHistory.get(order_id).get(tmpOrderIdToHistory.get(order_id).size() - 1)
-					.equals(Integer.parseInt("-1"))) {
-				tmpOrderIdToHistory.get(order_id).set(tmpOrderIdToHistory.get(order_id).size() - 1,
-						Integer.parseInt(amount));
-			} else {
+			if (tmpOrderIdToHistory.get(order_id).get(tmpOrderIdToHistory.get(order_id).size() - 1).equals(Integer.parseInt("-1"))) {
+				tmpOrderIdToHistory.get(order_id).set(tmpOrderIdToHistory.get(order_id).size() - 1,Integer.parseInt(amount));
+			}
+			else{
 				tmpOrderIdToHistory.get(order_id).add(Integer.parseInt(amount));
 			}
 
 		}
 	}
 
-	private CompletableFuture<Void> initialStructures() {
+	private void initialStructures() {
 
 		try {
 			// clear all the old orders
 			Set<String> oids = tmpOrderIdToOrder.keySet();
 			Set<String> temp = new HashSet<>();
-			CompletableFuture<Void> $ = CompletableFuture.completedFuture(null);
 			temp.addAll(oids);
 			for (String oid : temp) {
 				if (tmpProductIdToPrice.containsKey(tmpOrderIdToOrder.get(oid).getProduct_id())) {
@@ -220,22 +221,22 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 			for (String oid : tmpOrderIdToOrder.keySet()) {
 				orderIdToOrder.add(oid, tmpOrderIdToOrder.get(oid).toString().replaceAll("\\s+", ""));
 			}
-			$ = $.thenCompose(v -> orderIdToOrder.store());
+			orderIdToOrder.store().get();
 
 			for (String user : tmpUserIdToOrderIds.keySet()) {
 				userIdToOrderIds.add(user, tmpUserIdToOrderIds.get(user).toString().replaceAll("\\s+", ""));
 			}
-			$ = $.thenCompose(v -> userIdToOrderIds.store());
+			userIdToOrderIds.store().get();
 
 			for (String pid : tmpProductIdToOrderIds.keySet()) {
 				productIdToOrderIds.add(pid, tmpProductIdToOrderIds.get(pid).toString().replaceAll("\\s+", ""));
 			}
-			$ = $.thenCompose(v -> productIdToOrderIds.store());
+			productIdToOrderIds.store().get();
 
 			for (String oid : tmpOrderIdToHistory.keySet()) {
 				orderIdToHistory.add(oid, tmpOrderIdToHistory.get(oid).toString().replaceAll("\\s+", ""));
 			}
-			$ = $.thenCompose(v -> orderIdToHistory.store());
+			orderIdToHistory.store().get();
 
 			Map<String, Map<String, String>> tmpMap = new HashMap<>();
 
@@ -265,9 +266,7 @@ public class BuyProductInitializerImpl implements BuyProductInitializer {
 				}
 			}
 
-			$ = $.thenCompose(v -> UserProductAmount.store());
-
-			return $;
+			UserProductAmount.store().get();
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

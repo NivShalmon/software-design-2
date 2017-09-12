@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorage;
 import il.ac.technion.cs.sd.buy.ext.FutureLineStorageFactory;
-import static library.Util.*;
 
 /**
  * The provided implementation of {@link Dict}, using {@link FutureLineStorage}
@@ -30,10 +30,17 @@ public class DictImpl implements Dict {
 	}
 
 	public CompletableFuture<Void> store() {
-		return (storingStatus = storeToStorage(pairs, storer, storer))//
-				.thenAccept(s -> {
-					// empty block to turn this into CompletableFuture<Void>
-				});
+		return (storingStatus = storeToStorage(pairs, storer, storer)).thenAccept(s -> {
+		});
+	}
+
+	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store,
+			CompletableFuture<?> current) {
+		for (String key : map.keySet().stream().sorted().collect(Collectors.toList())) {
+			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(key)));
+			current = current.thenCompose(v -> store.thenCompose(s -> s.appendLine(map.get(key))));
+		}
+		return current;
 	}
 
 	@Override
@@ -48,6 +55,7 @@ public class DictImpl implements Dict {
 
 	@Override
 	public CompletableFuture<Optional<String>> find(String key) {
-		return storingStatus.thenCompose(v->BinarySearch.valueOf(storer, key, 0));
+		return storingStatus
+				.thenCompose(v -> BinarySearch.valueOf(storer, key, 0, storer.thenCompose(s -> s.numberOfLines())));
 	}
 }
