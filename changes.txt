@@ -1,3 +1,3 @@
-1. moved the function storeToStorage that was used by both Dict and DoubleKetDict to its own class called Util
+1. moved the function storeToStorage that was used by both Dict and DoubleKetDict to its own class
 2. changed the app so it doesn't user get
-3. changed the way we compose some of the CompletableFuture's in the library to ensure proper call order (in Dict, DoubleKetDict, BinarySearch and Util)
+3. changed the way we compose some of the CompletableFuture's in the library to ensure proper call order

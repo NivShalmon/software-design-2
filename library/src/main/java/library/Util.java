@@ -17,8 +17,8 @@ public class Util {
 	static CompletableFuture<?> storeToStorage(Map<String, String> map, CompletableFuture<FutureLineStorage> store,
 			CompletableFuture<?> current) {
 		for (String key : map.keySet().stream().sorted().collect(Collectors.toList())) {
-			current = doAfter(current,store,s->s.appendLine(key));
-			current = doAfter(current,store,s->s.appendLine(map.get(key)));
+			doAfter(current,store,s->s.appendLine(key));
+			doAfter(current,store,s->s.appendLine(map.get(key)));
 		}
 		return current;
 	}
